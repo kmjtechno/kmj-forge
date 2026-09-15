@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kmjtechno/kmj-forge/schemas/evidence.schema.json",
+  "title": "KMJ Forge Evidence Record",
+  "type": "object",
+  "required": [
+    "schema_version", "evidence_id", "task_id", "kind", "status", "timestamp"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "evidence_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "minLength": 1},
+    "command": {"type": ["string", "null"]},
+    "environment": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "details": {"type": "object"}
+  },
+  "additionalProperties": false
+}
