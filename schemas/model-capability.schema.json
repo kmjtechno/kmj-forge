@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kmjtechno/kmj-forge/schemas/model-capability.schema.json",
+  "title": "KMJ Forge Model Capability",
+  "type": "object",
+  "required": [
+    "schema_version", "provider", "model_id", "capabilities",
+    "context_window", "input_price_per_million",
+    "output_price_per_million", "available", "local"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "provider": {"type": "string", "minLength": 1},
+    "model_id": {"type": "string", "minLength": 1},
+    "capabilities": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "context_window": {"type": "integer", "minimum": 1},
+    "input_price_per_million": {"type": "number", "minimum": 0},
+    "output_price_per_million": {"type": "number", "minimum": 0},
+    "available": {"type": "boolean"},
+    "local": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}
