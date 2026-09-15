@@ -17,6 +17,25 @@ def _string_tuple(name: str, value: tuple[str, ...]) -> None:
         raise TypeError(f"{name} must be a tuple of strings")
 
 
+def _require_bool(name: str, value: bool) -> None:
+    if type(value) is not bool:
+        raise TypeError(f"{name} must be a boolean")
+
+
+def _require_positive_int(name: str, value: int) -> None:
+    if type(value) is not int:
+        raise TypeError(f"{name} must be an integer")
+    if value <= 0:
+        raise ValueError(f"{name} must be positive")
+
+
+def _require_nonnegative_number(name: str, value: float) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{name} must be a number")
+    if value < 0:
+        raise ValueError(f"{name} cannot be negative")
+
+
 @dataclass(frozen=True, slots=True)
 class Task:
     task_id: str
@@ -65,14 +84,16 @@ class ModelCapability:
     available: bool
     local: bool
     schema_version: str = SCHEMA_VERSION
+
     def __post_init__(self) -> None:
         _require_text("provider", self.provider)
         _require_text("model_id", self.model_id)
         _string_tuple("capabilities", self.capabilities)
-        if self.context_window <= 0:
-            raise ValueError("context_window must be positive")
-        if self.input_price_per_million < 0 or self.output_price_per_million < 0:
-            raise ValueError("model prices cannot be negative")
+        _require_positive_int("context_window", self.context_window)
+        _require_nonnegative_number("input_price_per_million", self.input_price_per_million)
+        _require_nonnegative_number("output_price_per_million", self.output_price_per_million)
+        _require_bool("available", self.available)
+        _require_bool("local", self.local)
         if self.schema_version != SCHEMA_VERSION:
             raise ValueError(f"unsupported ModelCapability schema_version: {self.schema_version}")
 
@@ -91,11 +112,11 @@ class ModelCapability:
             provider=data["provider"],
             model_id=data["model_id"],
             capabilities=tuple(data["capabilities"]),
-            context_window=int(data["context_window"]),
-            input_price_per_million=float(data["input_price_per_million"]),
-            output_price_per_million=float(data["output_price_per_million"]),
-            available=bool(data["available"]),
-            local=bool(data["local"]),
+            context_window=data["context_window"],
+            input_price_per_million=data["input_price_per_million"],
+            output_price_per_million=data["output_price_per_million"],
+            available=data["available"],
+            local=data["local"],
             schema_version=data.get("schema_version", SCHEMA_VERSION),
         )
 
@@ -130,6 +151,7 @@ class EvidenceRecord:
         data["changed_files"] = list(self.changed_files)
         data["artifacts"] = list(self.artifacts)
         return data
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EvidenceRecord":
         return cls(
