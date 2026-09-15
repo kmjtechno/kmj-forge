@@ -1,0 +1,2048 @@
+# ============================================================
+# KMJ FORGE — MASTER ROADMAP
+# Universal + Free + Local-First AI Software Engineering Agent
+# Version: 2.0
+# Date: 2026-09-15
+# ============================================================
+#
+# MASTER PRODUCT VISION
+# ---------------------
+# Build a genuinely universal AI software-engineering system that can
+# understand, build, debug, test, review, optimize and ship almost any
+# kind of software project.
+#
+# NON-NEGOTIABLE PRODUCT POSITION:
+#   UNIVERSAL FIRST
+#   FREE FIRST
+#   LOCAL FIRST
+#   OPEN-SOURCE FIRST
+#   PROVIDER-AGNOSTIC
+#   MODEL-AGNOSTIC
+#   LANGUAGE-AGNOSTIC
+#   IDE-AGNOSTIC
+#   PLATFORM-AGNOSTIC
+#
+# Research references:
+#   gstack       -> https://github.com/garrytan/gstack
+#   Superpowers -> https://github.com/obra/superpowers
+#   OpenHands   -> https://github.com/OpenHands/software-agent-sdk
+#   SWE-agent   -> https://github.com/SWE-agent/SWE-agent
+#   Aider       -> https://github.com/Aider-AI/aider
+#   Cline       -> https://github.com/cline/cline
+#   Gemini CLI   -> https://github.com/google-gemini/gemini-cli
+#
+# The goal is NOT to clone any of them.
+# Their strongest engineering ideas are used as references for a new,
+# modular, open, universal agent architecture.
+# ============================================================
+
+project:
+  name: "KMJ Forge"
+  codename: "Forge"
+  version: "2.0"
+  mission: >
+    Create a universal AI software engineering agent that can take a
+    natural-language goal, understand an unfamiliar project, plan the work,
+    autonomously implement it, test it, debug failures, review its own work,
+    verify the result, and optionally ship it.
+  tagline: >
+    Tell it what to build. Forge understands, plans, codes, tests, fixes,
+    reviews and delivers.
+  product_type: "Universal AI Software Engineering Operating System"
+
+  primary_goals:
+    - "Maximum universality"
+    - "Maximum capability"
+    - "Free and open-source operation wherever technically possible"
+    - "Local-first execution"
+    - "Optional cloud model support without provider lock-in"
+    - "Reliable long-horizon autonomous coding"
+    - "Evidence-based completion"
+    - "Safe autonomy"
+    - "Extensibility without rewriting the core"
+
+  anti_goals:
+    - "Do not become dependent on one commercial AI provider."
+    - "Do not require a paid API for core operation."
+    - "Do not optimize only for web development."
+    - "Do not hard-code support for individual languages into the orchestrator."
+    - "Do not copy gstack or Superpowers."
+    - "Do not build a giant prompt instead of an actual engineering system."
+    - "Do not claim success without verification evidence."
+    - "Do not sacrifice security for autonomy."
+
+# ============================================================
+# 1. CORE PHILOSOPHY
+# ============================================================
+
+philosophy:
+  universal_first:
+    requirement: true
+    meaning:
+      - "Any language"
+      - "Any framework"
+      - "Any operating system"
+      - "Any IDE"
+      - "Any build system"
+      - "Any repository layout"
+      - "Any reasonable software domain"
+    architecture_rule: >
+      New language/framework/platform support must be addable through adapters,
+      skills, analyzers, tool plugins or recipes rather than changes to the
+      core orchestration engine.
+
+  free_first:
+    requirement: true
+    meaning:
+      - "Core project is free/open-source."
+      - "Core agent must be able to run without paid APIs."
+      - "Local models are first-class."
+      - "Free/open-source tools are preferred."
+      - "Cloud providers are optional adapters."
+      - "No artificial feature lock that makes the free version useless."
+
+  local_first:
+    requirement: true
+    principles:
+      - "Local filesystem"
+      - "Local Git"
+      - "Local terminal"
+      - "Local sandbox"
+      - "Local models where available"
+      - "Local embeddings/indexes"
+      - "Local project memory"
+      - "Offline-capable core workflows"
+
+  open_source_first:
+    requirement: true
+    principles:
+      - "Prefer permissively licensed components."
+      - "Track licenses."
+      - "Avoid dependencies that make distribution legally ambiguous."
+      - "Allow users to replace major components."
+
+  provider_agnostic:
+    requirement: true
+    supported_model_categories:
+      - "Local Ollama-compatible models"
+      - "OpenAI-compatible APIs"
+      - "Anthropic-compatible APIs"
+      - "Google-compatible APIs"
+      - "Other OpenAI-compatible providers"
+      - "Future providers"
+    rule: "No provider-specific API in the core agent."
+
+  model_agnostic:
+    requirement: true
+    rule: >
+      The agent must reason about model capabilities rather than assume that
+      one specific model is always best.
+
+  evidence_over_claims:
+    requirement: true
+    rule: >
+      'Done' means the implementation satisfies requirements and available
+      verification evidence supports the claim.
+
+# ============================================================
+# 2. UNIVERSALITY MATRIX
+# ============================================================
+
+universal_support:
+  languages:
+    tier_1:
+      - "Python"
+      - "JavaScript"
+      - "TypeScript"
+      - "C"
+      - "C++"
+      - "C#"
+      - "Java"
+      - "Go"
+      - "Rust"
+      - "SQL"
+      - "Shell"
+    tier_2:
+      - "Kotlin"
+      - "Swift"
+      - "Dart"
+      - "PHP"
+      - "Ruby"
+      - "Lua"
+      - "R"
+      - "Scala"
+      - "Objective-C"
+      - "MATLAB"
+    extensible:
+      rule: >
+        Any language with a parser, compiler/interpreter, formatter, linter
+        or command-line tool should be supportable through a language adapter.
+
+  domains:
+    - "Web"
+    - "Backend"
+    - "Frontend"
+    - "Desktop"
+    - "Mobile"
+    - "Game development"
+    - "AI/ML"
+    - "Data engineering"
+    - "DevOps"
+    - "Cloud"
+    - "Embedded"
+    - "Systems programming"
+    - "Graphics"
+    - "Shaders"
+    - "Automation"
+    - "Cybersecurity defensive engineering"
+    - "Databases"
+    - "Legacy modernization"
+    - "Scientific computing"
+    - "Plugins/extensions"
+    - "CLI applications"
+
+  game_engines:
+    - "Unreal Engine"
+    - "Unity"
+    - "Godot"
+  graphics:
+    - "OpenGL"
+    - "Vulkan"
+    - "DirectX"
+    - "Metal"
+    - "WebGPU"
+    - "CUDA"
+  operating_systems:
+    - "Windows"
+    - "Linux"
+    - "macOS"
+  IDEs:
+    - "VS Code"
+    - "JetBrains"
+    - "Visual Studio"
+    - "Cursor-compatible workflows"
+    - "CLI-only"
+  repositories:
+    - "Git"
+    - "GitHub"
+    - "GitLab"
+    - "Bitbucket-compatible Git workflows"
+    - "Monorepos"
+    - "Multi-repository systems"
+
+# ============================================================
+# 3. FREE / LOCAL ARCHITECTURE
+# ============================================================
+
+cost_model:
+  default_mode: "FREE_LOCAL"
+  layers:
+    free_local:
+      mandatory: true
+      components:
+        - "Local model runtime"
+        - "Local embeddings"
+        - "Local vector index"
+        - "Local code index"
+        - "Local sandbox"
+        - "Local terminal"
+        - "Local Git"
+        - "Local browser"
+        - "Local telemetry"
+        - "Local memory"
+
+    free_optional:
+      mandatory: false
+      examples:
+        - "Free-tier cloud model"
+        - "Free hosted inference"
+        - "Public documentation sources"
+        - "Public CI"
+
+    paid_optional:
+      mandatory: false
+      examples:
+        - "Premium frontier model"
+        - "Premium cloud sandbox"
+        - "Premium hosted agent"
+        - "Premium observability"
+
+  hard_rules:
+    - "Paid services can improve quality but must not be required for the core."
+    - "The user can disable all cloud providers."
+    - "No telemetry is required for local operation."
+    - "No project source code is uploaded by default."
+    - "Model provider selection is user-controlled or policy-controlled."
+
+# ============================================================
+# 4. HIGH-LEVEL ARCHITECTURE
+# ============================================================
+
+architecture:
+  system:
+    experience:
+      - "CLI"
+      - "Desktop application"
+      - "VS Code extension"
+      - "JetBrains plugin"
+      - "Web dashboard (optional)"
+    intelligence:
+      - "Intent engine"
+      - "Repository intelligence"
+      - "Context engine"
+      - "Planning engine"
+      - "Agent orchestrator"
+      - "Model router"
+      - "Memory engine"
+      - "Skill engine"
+    execution:
+      - "Tool runtime"
+      - "Workspace manager"
+      - "Sandbox"
+      - "Browser runtime"
+      - "Container/VM runtime"
+    verification:
+      - "Test engine"
+      - "Build engine"
+      - "Review engine"
+      - "Security engine"
+      - "Performance engine"
+    governance:
+      - "Permissions"
+      - "Policy engine"
+      - "Audit log"
+      - "Approval gates"
+      - "Rollback"
+    ecosystem:
+      - "Plugin SDK"
+      - "Skill SDK"
+      - "Model adapter SDK"
+      - "Tool adapter SDK"
+      - "Language adapter SDK"
+
+  principle:
+    - "Core remains small."
+    - "Capabilities live in modular subsystems."
+    - "Configuration drives workflows."
+    - "Plugins extend capabilities."
+    - "Skills define domain procedures."
+    - "Models provide reasoning."
+    - "Tools provide evidence and execution."
+
+# ============================================================
+# 5. MASTER AGENT STATE MACHINE
+# ============================================================
+
+agent_state_machine:
+  states:
+    - "RECEIVE"
+    - "CLASSIFY"
+    - "UNDERSTAND"
+    - "DISCOVER"
+    - "RESEARCH"
+    - "SPECIFY"
+    - "PLAN"
+    - "PLAN_REVIEW"
+    - "PREPARE"
+    - "IMPLEMENT"
+    - "TEST"
+    - "DIAGNOSE"
+    - "REPAIR"
+    - "REVIEW"
+    - "SECURITY_REVIEW"
+    - "PERFORMANCE_REVIEW"
+    - "REGRESSION"
+    - "USER_ACCEPTANCE"
+    - "SHIP"
+    - "LEARN"
+    - "COMPLETE"
+    - "BLOCKED"
+    - "ESCALATE"
+
+  mandatory_transitions:
+    simple_task:
+      - "RECEIVE"
+      - "CLASSIFY"
+      - "DISCOVER"
+      - "IMPLEMENT"
+      - "TEST"
+      - "REVIEW"
+      - "COMPLETE"
+
+    normal_task:
+      - "RECEIVE"
+      - "CLASSIFY"
+      - "UNDERSTAND"
+      - "DISCOVER"
+      - "SPECIFY"
+      - "PLAN"
+      - "PLAN_REVIEW"
+      - "PREPARE"
+      - "IMPLEMENT"
+      - "TEST"
+      - "REVIEW"
+      - "REGRESSION"
+      - "COMPLETE"
+
+    complex_task:
+      - "RECEIVE"
+      - "CLASSIFY"
+      - "UNDERSTAND"
+      - "DISCOVER"
+      - "RESEARCH"
+      - "SPECIFY"
+      - "PLAN"
+      - "PLAN_REVIEW"
+      - "PREPARE"
+      - "IMPLEMENT"
+      - "TEST"
+      - "DIAGNOSE"
+      - "REPAIR"
+      - "REVIEW"
+      - "SECURITY_REVIEW"
+      - "PERFORMANCE_REVIEW"
+      - "REGRESSION"
+      - "USER_ACCEPTANCE"
+      - "SHIP"
+      - "LEARN"
+      - "COMPLETE"
+
+  hard_rules:
+    - "No implementation of a complex task before an executable plan exists."
+    - "No final completion without verification."
+    - "Repeated failures trigger diagnosis."
+    - "Critical findings block completion."
+    - "High-risk actions require approval."
+    - "State is persisted so work can resume after interruption."
+
+# ============================================================
+# 6. AGENT TEAM
+# ============================================================
+
+agents:
+  manager:
+    role: "Master orchestrator"
+    duties:
+      - "Own state machine"
+      - "Decompose tasks"
+      - "Assign agents"
+      - "Manage budgets"
+      - "Escalate"
+      - "Integrate results"
+
+  product:
+    duties:
+      - "Understand user outcome"
+      - "Define acceptance criteria"
+      - "Detect scope creep"
+      - "Identify ambiguity"
+
+  researcher:
+    duties:
+      - "Explore unfamiliar repositories"
+      - "Research libraries/APIs"
+      - "Inspect documentation"
+      - "Compare implementation approaches"
+
+  architect:
+    duties:
+      - "Architecture"
+      - "Interfaces"
+      - "Data flow"
+      - "Failure modes"
+      - "Migration strategy"
+
+  planner:
+    duties:
+      - "Turn specification into executable task DAG"
+      - "Identify dependencies"
+      - "Define verification per task"
+
+  coder:
+    duties:
+      - "Implement scoped tasks"
+      - "Follow repository conventions"
+      - "Keep diffs reviewable"
+
+  debugger:
+    duties:
+      - "Reproduce bugs"
+      - "Find root causes"
+      - "Test hypotheses"
+      - "Implement minimal correct fixes"
+
+  tester:
+    duties:
+      - "Create tests"
+      - "Run tests"
+      - "Evaluate test quality"
+      - "Generate regression tests"
+
+  browser_qa:
+    duties:
+      - "Run real user flows"
+      - "Inspect DOM"
+      - "Inspect console/network"
+      - "Perform visual verification"
+
+  security:
+    duties:
+      - "Threat model"
+      - "Dependency audit"
+      - "Secret analysis"
+      - "Auth/authz review"
+      - "Injection review"
+
+  performance:
+    duties:
+      - "CPU profiling"
+      - "Memory profiling"
+      - "GPU profiling"
+      - "Network profiling"
+      - "Database profiling"
+
+  reviewer:
+    duties:
+      - "Requirements review"
+      - "Architecture review"
+      - "Diff review"
+      - "Regression analysis"
+
+  release:
+    duties:
+      - "Prepare commits"
+      - "Prepare PR"
+      - "Run final gates"
+      - "Deploy if authorized"
+      - "Verify deployment"
+
+  historian:
+    duties:
+      - "Record decisions"
+      - "Record failures"
+      - "Maintain reusable knowledge"
+      - "Detect stale memories"
+
+# ============================================================
+# 7. REPOSITORY INTELLIGENCE
+# ============================================================
+
+repository_intelligence:
+  objective: >
+    Understand the structure and behavior of a repository without wasting
+    model context on irrelevant files.
+
+  scanners:
+    - "File tree scanner"
+    - "Language detector"
+    - "Build-system detector"
+    - "Package-manager detector"
+    - "Framework detector"
+    - "Test-framework detector"
+    - "CI detector"
+    - "Container detector"
+    - "Infrastructure detector"
+    - "Documentation detector"
+    - "Git history scanner"
+
+  indexes:
+    structural:
+      - "Files"
+      - "Directories"
+      - "Symbols"
+      - "Classes"
+      - "Functions"
+      - "Interfaces"
+      - "Modules"
+    relational:
+      - "Imports"
+      - "Exports"
+      - "Calls"
+      - "Inheritance"
+      - "Dependencies"
+      - "Data flow"
+      - "Test-to-code relationships"
+    semantic:
+      - "Code embeddings"
+      - "Documentation embeddings"
+      - "Issue embeddings"
+      - "Commit embeddings"
+    historical:
+      - "Git commits"
+      - "Blame"
+      - "Changed-file history"
+      - "Previous bug fixes"
+
+  context_selection:
+    strategy:
+      - "Keyword retrieval"
+      - "Symbol retrieval"
+      - "Dependency traversal"
+      - "Semantic retrieval"
+      - "Git-history retrieval"
+      - "Test relationship retrieval"
+      - "Ranked context assembly"
+    rule: "Prefer relevant evidence over repository-wide dumping."
+
+# ============================================================
+# 8. CONTEXT ENGINE
+# ============================================================
+
+context_engine:
+  goals:
+    - "Maximum reasoning quality per token."
+    - "Keep context fresh."
+    - "Prevent irrelevant repository flooding."
+    - "Make previous failures available."
+  packet:
+    required:
+      - "User request"
+      - "Acceptance criteria"
+      - "Relevant files"
+      - "Relevant symbols"
+      - "Dependencies"
+      - "Existing tests"
+      - "Build commands"
+      - "Constraints"
+    optional:
+      - "Git history"
+      - "Documentation"
+      - "Previous attempts"
+      - "Runtime logs"
+      - "Screenshots"
+  compression:
+    - "Hierarchical summaries"
+    - "Symbol-level summaries"
+    - "Task summaries"
+    - "Subagent result compression"
+  invalidation:
+    - "Changed files invalidate related context."
+    - "Changed interfaces invalidate dependent summaries."
+    - "New dependencies trigger graph refresh."
+
+# ============================================================
+# 9. MODEL ROUTER
+# ============================================================
+
+model_router:
+  objective: "Automatically select the cheapest capable model."
+
+  capability_profiles:
+    - "fast"
+    - "coding"
+    - "reasoning"
+    - "long_context"
+    - "vision"
+    - "tool_use"
+    - "planning"
+    - "debugging"
+    - "security_review"
+
+  tiers:
+    local_fast:
+      use:
+        - "Classification"
+        - "Simple search"
+        - "Formatting"
+        - "Small edits"
+        - "Simple tests"
+    local_strong:
+      use:
+        - "Routine coding"
+        - "Debugging"
+        - "Refactoring"
+    cloud_free:
+      use:
+        - "Optional free-tier reasoning"
+    cloud_strong:
+      use:
+        - "Complex architecture"
+        - "Hard debugging"
+        - "Large refactors"
+    frontier_optional:
+      use:
+        - "Very difficult unresolved tasks"
+        - "Second-opinion review"
+
+  routing_signals:
+    - "Task complexity"
+    - "Repository size"
+    - "Number of affected modules"
+    - "Required context size"
+    - "Failure count"
+    - "Security sensitivity"
+    - "Latency budget"
+    - "Cost budget"
+    - "Model confidence"
+
+  escalation:
+    rules:
+      - "Two failed attempts -> deeper diagnosis."
+      - "Three failed attempts -> independent agent."
+      - "Persistent disagreement -> stronger model or human."
+      - "Model contradiction with tests -> trust executable evidence."
+
+  provider_adapter:
+    interface:
+      - "list_models"
+      - "capabilities"
+      - "generate"
+      - "stream"
+      - "tool_call"
+      - "cancel"
+      - "usage"
+      - "health_check"
+
+# ============================================================
+# 10. TOOL SYSTEM
+# ============================================================
+
+tools:
+  core:
+    - "read_file"
+    - "write_file"
+    - "patch_file"
+    - "search_text"
+    - "search_symbol"
+    - "semantic_search"
+    - "repo_map"
+    - "dependency_graph"
+    - "terminal"
+    - "git"
+    - "build"
+    - "test"
+    - "logs"
+
+  advanced:
+    - "browser"
+    - "screenshot"
+    - "database"
+    - "docker"
+    - "vm"
+    - "profiler"
+    - "network_inspector"
+    - "package_manager"
+    - "issue_tracker"
+    - "pull_request"
+    - "cloud"
+    - "mcp"
+
+  future:
+    - "visual_editor"
+    - "game_engine_editor"
+    - "mobile_emulator"
+    - "hardware_debugger"
+    - "embedded_flasher"
+    - "CAD_or_design_tool_adapter"
+
+  contract:
+    every_tool:
+      - "Typed schema"
+      - "Permission class"
+      - "Timeout"
+      - "Cancellation"
+      - "Retry policy"
+      - "Audit event"
+      - "Structured error"
+      - "Evidence output"
+
+# ============================================================
+# 11. SKILL SYSTEM
+# ============================================================
+
+skills:
+  architecture:
+    mandatory: true
+  brainstorming:
+    mandatory: true
+  specification:
+    mandatory: true
+  planning:
+    mandatory: true
+  repository_discovery:
+    mandatory: true
+  tdd:
+    mandatory: true
+  implementation:
+    mandatory: true
+  systematic_debugging:
+    mandatory: true
+  verification:
+    mandatory: true
+  code_review:
+    mandatory: true
+  security_review:
+    mandatory: true
+  release:
+    mandatory: false
+
+  domain_skills:
+    - "web_development"
+    - "backend"
+    - "frontend"
+    - "desktop"
+    - "mobile"
+    - "game_development"
+    - "unreal_engine"
+    - "unity"
+    - "godot"
+    - "ai_ml"
+    - "data"
+    - "devops"
+    - "database"
+    - "embedded"
+    - "graphics"
+    - "legacy_modernization"
+    - "performance"
+    - "accessibility"
+    - "internationalization"
+
+  skill_contract:
+    fields:
+      - "name"
+      - "description"
+      - "trigger_conditions"
+      - "required_context"
+      - "required_tools"
+      - "procedure"
+      - "verification"
+      - "failure_modes"
+      - "escalation"
+      - "output_schema"
+
+  extensibility:
+    rule: >
+      Anyone can add a new skill without modifying the core orchestrator.
+
+# ============================================================
+# 12. PLANNING ENGINE
+# ============================================================
+
+planning:
+  complexity_levels:
+    trivial:
+      flow:
+        - "discover"
+        - "edit"
+        - "verify"
+    small:
+      flow:
+        - "discover"
+        - "acceptance_criteria"
+        - "plan"
+        - "implement"
+        - "verify"
+    medium:
+      flow:
+        - "specify"
+        - "architecture_check"
+        - "task_dag"
+        - "implement"
+        - "review"
+        - "verify"
+    large:
+      flow:
+        - "product"
+        - "architecture"
+        - "security"
+        - "UX"
+        - "migration"
+        - "task_dag"
+        - "parallel_execution"
+        - "integration"
+        - "adversarial_review"
+        - "verification"
+
+  plan_schema:
+    required:
+      - "objective"
+      - "scope"
+      - "acceptance_criteria"
+      - "affected_components"
+      - "tasks"
+      - "dependencies"
+      - "test_strategy"
+      - "risk"
+      - "rollback"
+    task:
+      - "id"
+      - "description"
+      - "files"
+      - "dependencies"
+      - "agent"
+      - "verification"
+
+# ============================================================
+# 13. MULTI-AGENT EXECUTION
+# ============================================================
+
+multi_agent:
+  architecture:
+    manager:
+      owns:
+        - "state"
+        - "budget"
+        - "task DAG"
+        - "integration"
+    workers:
+      can_run_parallel: true
+
+  parallelization:
+    allowed:
+      - "Independent modules"
+      - "Independent research"
+      - "Independent test design"
+      - "Independent review"
+    forbidden:
+      - "Conflicting critical files"
+      - "Unresolved interface design"
+      - "Unsafe database migrations"
+
+  workspaces:
+    default:
+      - "isolated worktree"
+      - "checkpoint"
+    merge:
+      - "dependency order"
+      - "targeted tests"
+      - "conflict resolution"
+      - "full regression"
+
+  communication:
+    subagent_output:
+      required:
+        - "summary"
+        - "files_changed"
+        - "evidence"
+        - "tests"
+        - "risks"
+        - "unresolved_questions"
+
+# ============================================================
+# 14. CODING ENGINE
+# ============================================================
+
+coding:
+  rules:
+    - "Read before editing."
+    - "Follow existing project conventions unless intentionally changing them."
+    - "Prefer minimal coherent changes."
+    - "Do not rewrite unrelated code."
+    - "Preserve public interfaces unless change is required."
+    - "Use existing dependencies before adding new ones."
+    - "Explain architectural changes in task memory."
+
+  edit_strategy:
+    - "Precise patch"
+    - "AST-aware transformation where possible"
+    - "Format after modification"
+    - "Compile/type-check"
+    - "Run targeted tests"
+
+# ============================================================
+# 15. TDD + TESTING
+# ============================================================
+
+testing:
+  default:
+    - "RED"
+    - "GREEN"
+    - "REFACTOR"
+    - "VERIFY"
+
+  layers:
+    - "Unit"
+    - "Component"
+    - "Integration"
+    - "Contract"
+    - "End-to-end"
+    - "Browser"
+    - "Performance"
+    - "Security"
+
+  rules:
+    - "Never weaken a test merely to obtain green."
+    - "A passing test must exercise the requirement."
+    - "Bug fixes should receive regression tests."
+    - "Prefer deterministic tests."
+    - "Run the narrowest relevant tests first, then expand."
+
+# ============================================================
+# 16. SYSTEMATIC DEBUGGING
+# ============================================================
+
+debugging:
+  protocol:
+    - "Collect exact error."
+    - "Reproduce."
+    - "Minimize reproduction."
+    - "Inspect stack/logs."
+    - "Trace control/data flow."
+    - "Generate hypotheses."
+    - "Design discriminating experiment."
+    - "Test hypothesis."
+    - "Identify root cause."
+    - "Implement minimal fix."
+    - "Reproduce original success."
+    - "Run regression."
+    - "Document prevention."
+
+  failure_escalation:
+    attempt_1: "Normal diagnosis."
+    attempt_2: "Expanded context + history."
+    attempt_3: "Independent debugger + stronger reasoning."
+    attempt_4: "Architecture reset or human escalation."
+
+  prohibited:
+    - "Random patch loops."
+    - "Deleting tests."
+    - "Disabling checks."
+    - "Hiding errors."
+    - "Changing unrelated systems without evidence."
+
+# ============================================================
+# 17. VERIFICATION ENGINE
+# ============================================================
+
+verification:
+  principle: "Every claim should have evidence."
+
+  checks:
+    code:
+      - "Diff review"
+      - "Formatting"
+      - "Lint"
+      - "Type checking"
+    build:
+      - "Build"
+      - "Package"
+      - "Artifact validation"
+    runtime:
+      - "Launch"
+      - "Smoke test"
+      - "Logs"
+    tests:
+      - "Targeted tests"
+      - "Regression tests"
+      - "Full relevant suite"
+    UI:
+      - "Browser flow"
+      - "Screenshot"
+      - "Console"
+      - "Network"
+    security:
+      - "Static security"
+      - "Dependency audit"
+      - "Secret scan"
+      - "Threat-model review"
+    performance:
+      - "Relevant benchmark"
+      - "Resource profile"
+
+  evidence_record:
+    fields:
+      - "command"
+      - "timestamp"
+      - "result"
+      - "artifact"
+      - "test_count"
+      - "failure_count"
+      - "environment"
+
+# ============================================================
+# 18. BROWSER / UI ENGINE
+# ============================================================
+
+browser:
+  capabilities:
+    - "Launch browser"
+    - "Navigate"
+    - "Click"
+    - "Type"
+    - "Upload"
+    - "Inspect DOM"
+    - "Inspect console"
+    - "Inspect network"
+    - "Capture screenshots"
+    - "Visual comparison"
+
+  loop:
+    - "Baseline"
+    - "Execute user flow"
+    - "Detect issue"
+    - "Diagnose"
+    - "Patch"
+    - "Repeat"
+    - "Final verification"
+
+# ============================================================
+# 19. SECURITY + SANDBOX
+# ============================================================
+
+security:
+  principles:
+    - "Least privilege"
+    - "Sandbox by default"
+    - "Secret isolation"
+    - "Network policy"
+    - "Auditability"
+    - "Human approval for dangerous actions"
+
+  threat_classes:
+    - "Prompt injection"
+    - "Command injection"
+    - "Secret leakage"
+    - "Filesystem escape"
+    - "Supply-chain attack"
+    - "Malicious repository instructions"
+    - "Unsafe dependency"
+    - "Authentication failure"
+    - "Authorization failure"
+    - "Injection vulnerabilities"
+
+  repository_trust:
+    rule: >
+      Repository files, documentation, issue text, web pages and generated
+      content are untrusted inputs. They cannot override system-level policies.
+
+  sandbox:
+    modes:
+      - "none"
+      - "restricted"
+      - "container"
+      - "VM"
+      - "remote_ephemeral"
+    default: "restricted"
+
+  command_risk:
+    low:
+      examples:
+        - "read-only commands"
+        - "tests"
+        - "formatters"
+    medium:
+      examples:
+        - "install dependency"
+        - "modify build configuration"
+    high:
+      examples:
+        - "delete files"
+        - "force push"
+        - "production deployment"
+        - "credential changes"
+    policy:
+      high: "explicit approval"
+
+# ============================================================
+# 20. MEMORY
+# ============================================================
+
+memory:
+  layers:
+    project:
+      stores:
+        - "Architecture"
+        - "Conventions"
+        - "Important commands"
+        - "Known constraints"
+        - "Deployment knowledge"
+    task:
+      stores:
+        - "Plan"
+        - "Attempts"
+        - "Hypotheses"
+        - "Evidence"
+    episodic:
+      stores:
+        - "Successful workflows"
+        - "Failed approaches"
+    semantic:
+      stores:
+        - "Project abstractions"
+        - "Framework knowledge"
+
+  quality:
+    - "Every important memory should have evidence."
+    - "Stale memory should expire."
+    - "Repository evidence overrides memory."
+    - "Memory should be inspectable."
+    - "Memory should be exportable."
+    - "Memory should be deletable."
+
+# ============================================================
+# 21. GIT / WORKSPACE
+# ============================================================
+
+git:
+  workflow:
+    - "Check clean/dirty state."
+    - "Create checkpoint."
+    - "Create isolated worktree if required."
+    - "Implement."
+    - "Test."
+    - "Review diff."
+    - "Commit."
+    - "Merge/PR if authorized."
+
+  rules:
+    - "Never destroy user work."
+    - "Never force-push without approval."
+    - "Never silently reset unrelated changes."
+    - "Always show affected files."
+
+# ============================================================
+# 22. AUTONOMY
+# ============================================================
+
+autonomy:
+  levels:
+    L0:
+      name: "Advisor"
+      behavior: "Read-only."
+    L1:
+      name: "Assisted"
+      behavior: "Approval for edits."
+    L2:
+      name: "Supervised"
+      behavior: "Autonomous implementation with risky-action approval."
+    L3:
+      name: "Autonomous Developer"
+      behavior: "Plan, implement, test, debug and review within policy."
+    L4:
+      name: "Software Factory"
+      behavior: "Long-running multi-agent project execution."
+
+  default: "L2"
+
+  autonomy_upgrade:
+    requirements:
+      - "Stable verification."
+      - "Low regression rate."
+      - "Safe tool policy."
+      - "User-configured permissions."
+
+# ============================================================
+# 23. PLUGIN ECOSYSTEM
+# ============================================================
+
+plugins:
+  goals:
+    - "Add capabilities without modifying core."
+    - "Allow community extensions."
+    - "Allow local/private plugins."
+  types:
+    - "Language adapter"
+    - "Framework adapter"
+    - "Model adapter"
+    - "Tool adapter"
+    - "Skill pack"
+    - "IDE integration"
+    - "Browser integration"
+    - "Cloud provider"
+    - "Game-engine integration"
+    - "Database integration"
+
+  plugin_manifest:
+    required:
+      - "name"
+      - "version"
+      - "license"
+      - "capabilities"
+      - "permissions"
+      - "dependencies"
+      - "entrypoint"
+      - "compatibility"
+
+# ============================================================
+# 24. LANGUAGE ADAPTER SYSTEM
+# ============================================================
+
+language_adapter:
+  interface:
+    - "detect"
+    - "parse"
+    - "symbols"
+    - "references"
+    - "format"
+    - "lint"
+    - "type_check"
+    - "build"
+    - "test"
+    - "debug"
+  fallback:
+    rule: >
+      If no specialized adapter exists, use generic text/terminal/Git tooling
+      rather than refusing the task.
+
+# ============================================================
+# 25. FRAMEWORK / DOMAIN ADAPTERS
+# ============================================================
+
+domain_adapters:
+  web:
+    - "Frontend recipes"
+    - "Backend recipes"
+    - "Browser QA"
+    - "Accessibility"
+  games:
+    - "Unreal"
+    - "Unity"
+    - "Godot"
+    - "Asset/build/debug workflows"
+  mobile:
+    - "Android"
+    - "iOS"
+    - "Flutter"
+    - "React Native"
+  ai_ml:
+    - "Python"
+    - "GPU"
+    - "Model training"
+    - "Inference"
+  devops:
+    - "Docker"
+    - "Kubernetes"
+    - "CI/CD"
+    - "Terraform"
+
+# ============================================================
+# 26. SELF-IMPROVEMENT
+# ============================================================
+
+self_improvement:
+  allowed:
+    - "Analyze failures."
+    - "Propose new skills."
+    - "Improve retrieval ranking."
+    - "Improve routing."
+    - "Generate regression fixtures."
+    - "Optimize workflows."
+  forbidden:
+    - "Silently modify security policies."
+    - "Silently modify permission boundaries."
+    - "Silently remove verification."
+    - "Silently weaken benchmark requirements."
+
+  learning_loop:
+    - "Observe failure."
+    - "Classify failure."
+    - "Find root cause."
+    - "Generate improvement proposal."
+    - "Run benchmark."
+    - "Compare against baseline."
+    - "Accept improvement only if metrics improve without unacceptable regressions."
+
+# ============================================================
+# 27. BENCHMARK SYSTEM
+# ============================================================
+
+benchmarks:
+  philosophy:
+    - "Do not optimize only for SWE-bench."
+    - "Test real long-horizon engineering."
+    - "Measure quality and cost together."
+    - "Measure regressions."
+
+  task_categories:
+    - "Simple bug"
+    - "Complex bug"
+    - "New feature"
+    - "Large feature"
+    - "Refactor"
+    - "Migration"
+    - "Security fix"
+    - "Performance optimization"
+    - "UI reconstruction"
+    - "Legacy modernization"
+    - "Multi-repository change"
+    - "Game-engine task"
+    - "Build-system failure"
+    - "Dependency conflict"
+    - "Production incident simulation"
+
+  metrics:
+    primary:
+      - "Verified success rate"
+      - "Human acceptance rate"
+    secondary:
+      - "Time"
+      - "Cost"
+      - "Token usage"
+      - "Regression rate"
+      - "Intervention rate"
+      - "Retries"
+      - "Escalations"
+      - "Review escape rate"
+
+# ============================================================
+# 28. OBSERVABILITY
+# ============================================================
+
+observability:
+  run_record:
+    - "run_id"
+    - "task_id"
+    - "model"
+    - "model_version"
+    - "agent"
+    - "tool_calls"
+    - "files_read"
+    - "files_changed"
+    - "commands"
+    - "tests"
+    - "reviews"
+    - "security_findings"
+    - "token_usage"
+    - "cost"
+    - "duration"
+    - "retries"
+    - "final_status"
+
+  privacy:
+    default: "local"
+    cloud_upload: "opt-in"
+
+# ============================================================
+# 29. USER EXPERIENCE
+# ============================================================
+
+ux:
+  primary_modes:
+    cli:
+      goal: "Fastest power-user workflow."
+    desktop:
+      goal: "Transparent autonomous development workspace."
+    ide:
+      goal: "Native coding workflow."
+    web:
+      goal: "Remote project management."
+
+  desktop_panels:
+    - "Project"
+    - "Task"
+    - "Plan"
+    - "Agent timeline"
+    - "Diff"
+    - "Terminal"
+    - "Tests"
+    - "Browser"
+    - "Reviews"
+    - "Security"
+    - "Memory"
+    - "Approvals"
+
+  ideal_interaction:
+    user:
+      - "Describe goal."
+    forge:
+      - "Understand."
+      - "Plan."
+      - "Execute."
+      - "Verify."
+    user:
+      - "Review result."
+    forge:
+      - "Explain evidence."
+
+# ============================================================
+# 30. MASTER DEVELOPMENT ROADMAP
+# ============================================================
+
+roadmap:
+
+  phase_00:
+    name: "Research + Architecture Freeze"
+    priority: "P0"
+    duration: "1-2 weeks"
+    objectives:
+      - "Study leading agent architectures."
+      - "Define Forge protocol."
+      - "Define state machine."
+      - "Define tool contract."
+      - "Define security model."
+      - "Define benchmark harness."
+    deliverables:
+      - "Architecture RFC"
+      - "Agent protocol"
+      - "State machine"
+      - "Permission model"
+      - "Benchmark specification"
+      - "Repository fixtures"
+    gate:
+      - "Interfaces versioned."
+      - "Security model reviewed."
+      - "MVP scope frozen."
+
+  phase_01:
+    name: "Minimal Universal Agent Kernel"
+    priority: "P0"
+    duration: "2-4 weeks"
+    build:
+      - "CLI"
+      - "Agent loop"
+      - "Filesystem"
+      - "Terminal"
+      - "Git"
+      - "Model adapter"
+      - "Checkpoint"
+      - "Rollback"
+      - "Permission engine"
+      - "Audit log"
+    gate:
+      - "Can solve basic repository tasks."
+      - "Can recover from command failure."
+      - "Can rollback."
+
+  phase_02:
+    name: "Universal Repository Intelligence"
+    priority: "P0"
+    duration: "3-6 weeks"
+    build:
+      - "Repository scanner"
+      - "Language detector"
+      - "AST pipeline"
+      - "Symbol index"
+      - "Dependency graph"
+      - "Semantic index"
+      - "Git history index"
+      - "Context ranker"
+    gate:
+      - "Agent can efficiently navigate unfamiliar repositories."
+      - "Context benchmark beats naive file dumping."
+
+  phase_03:
+    name: "Skills + Planning Engine"
+    priority: "P0"
+    duration: "3-5 weeks"
+    build:
+      - "Skill registry"
+      - "Skill trigger system"
+      - "Specification"
+      - "Planning"
+      - "Task DAG"
+      - "Verification plan"
+      - "Workflow gates"
+    gate:
+      - "Complex task becomes resumable executable plan."
+
+  phase_04:
+    name: "TDD + Verification Engine"
+    priority: "P0"
+    duration: "3-5 weeks"
+    build:
+      - "Test discovery"
+      - "TDD workflow"
+      - "Build verification"
+      - "Regression engine"
+      - "Evidence records"
+      - "Completion gate"
+    gate:
+      - "Agent cannot claim completion without evidence."
+
+  phase_05:
+    name: "Systematic Debugging + Self-Healing"
+    priority: "P0"
+    duration: "4-6 weeks"
+    build:
+      - "Failure classifier"
+      - "Reproduction manager"
+      - "Hypothesis engine"
+      - "Debugger agent"
+      - "Independent second-opinion agent"
+      - "Automatic regression tests"
+      - "Escalation engine"
+    gate:
+      - "Agent reliably solves multi-step bugs."
+      - "Random patch loops are controlled."
+
+  phase_06:
+    name: "Multi-Agent Orchestrator"
+    priority: "P0"
+    duration: "4-6 weeks"
+    build:
+      - "Manager"
+      - "Subagents"
+      - "Worktree manager"
+      - "Parallel task execution"
+      - "Integration"
+      - "Cross-review"
+    gate:
+      - "Independent tasks execute in parallel safely."
+
+  phase_07:
+    name: "Browser + UI Engineering"
+    priority: "P1"
+    duration: "3-5 weeks"
+    build:
+      - "Browser adapter"
+      - "DOM inspection"
+      - "Console/network"
+      - "Screenshot"
+      - "Visual regression"
+      - "UI review"
+    gate:
+      - "Can build and verify complete web features."
+
+  phase_08:
+    name: "Security + Safe Autonomy"
+    priority: "P0"
+    duration: "3-5 weeks"
+    build:
+      - "Sandbox"
+      - "Network policy"
+      - "Secret isolation"
+      - "Prompt-injection defenses"
+      - "Risk classifier"
+      - "Security review"
+    gate:
+      - "High-risk operations are controlled."
+      - "Malicious repository tests pass."
+
+  phase_09:
+    name: "Universal Model Router"
+    priority: "P1"
+    duration: "3-5 weeks"
+    build:
+      - "Capability registry"
+      - "Difficulty estimator"
+      - "Local model support"
+      - "Provider adapters"
+      - "Cost-aware routing"
+      - "Failure escalation"
+    gate:
+      - "Free/local mode remains functional."
+      - "Routing improves quality/cost over fixed model baseline."
+
+  phase_10:
+    name: "Universal Language + Framework Adapter SDK"
+    priority: "P0"
+    duration: "6-10 weeks"
+    build:
+      - "Language adapter API"
+      - "Framework recipes"
+      - "Build/test adapters"
+      - "Domain skill packs"
+      - "Game engine adapters"
+    gate:
+      - "New language support does not require core changes."
+
+  phase_11:
+    name: "Desktop Application"
+    priority: "P1"
+    duration: "5-8 weeks"
+    build:
+      - "Desktop UI"
+      - "Task timeline"
+      - "Plan viewer"
+      - "Diff viewer"
+      - "Approval center"
+      - "Terminal"
+      - "Test dashboard"
+    gate:
+      - "Full workflow available without CLI."
+
+  phase_12:
+    name: "IDE Integrations"
+    priority: "P1"
+    duration: "5-8 weeks"
+    build:
+      - "VS Code"
+      - "JetBrains"
+      - "Visual Studio where practical"
+    gate:
+      - "Forge can operate naturally inside major development environments."
+
+  phase_13:
+    name: "Remote Software Factory"
+    priority: "P2"
+    duration: "6-10 weeks"
+    build:
+      - "Agent server"
+      - "Job queue"
+      - "Ephemeral containers"
+      - "VM workers"
+      - "Persistent workspace"
+      - "GitHub/GitLab integration"
+      - "CI feedback loop"
+    gate:
+      - "Issue -> implementation -> PR -> CI -> repair works automatically within policy."
+
+  phase_14:
+    name: "Advanced Domain Intelligence"
+    priority: "P1"
+    duration: "ongoing"
+    domains:
+      - "Unreal Engine"
+      - "Unity"
+      - "Graphics"
+      - "CUDA"
+      - "Embedded"
+      - "Mobile"
+      - "AI/ML"
+      - "Legacy systems"
+      - "Distributed systems"
+      - "Databases"
+    gate:
+      - "Each domain has specialized skills, tools and benchmarks."
+
+  phase_15:
+    name: "Self-Improving Forge"
+    priority: "P2"
+    duration: "ongoing"
+    build:
+      - "Failure mining"
+      - "Skill synthesis"
+      - "Retrieval optimization"
+      - "Model routing optimization"
+      - "Benchmark-driven workflow evolution"
+      - "Automatic regression fixture generation"
+    gate:
+      - "Every improvement is benchmarked before activation."
+
+  phase_16:
+    name: "World-Class Production Hardening"
+    priority: "P0"
+    duration: "ongoing"
+    build:
+      - "Massive benchmark suite"
+      - "Adversarial repositories"
+      - "Prompt-injection tests"
+      - "Long-horizon tests"
+      - "Crash recovery"
+      - "Performance optimization"
+      - "Resource controls"
+      - "Privacy audit"
+    gate:
+      - "No major release without reproducible evidence."
+
+# ============================================================
+# 31. MVP DEFINITION
+# ============================================================
+
+mvp:
+  objective: >
+    Produce a useful autonomous coding agent that is genuinely free/local-first,
+    rather than a UI demo around a paid API.
+
+  must_have:
+    - "CLI"
+    - "Local model adapter"
+    - "Filesystem"
+    - "Terminal"
+    - "Git"
+    - "Repository scanner"
+    - "Repository map"
+    - "Semantic search"
+    - "Planner"
+    - "TDD"
+    - "Debugger"
+    - "Reviewer"
+    - "Checkpoint"
+    - "Rollback"
+    - "Permission system"
+    - "Audit log"
+    - "Benchmark harness"
+
+  should_not_have:
+    - "Large SaaS platform"
+    - "Complex social features"
+    - "Mandatory cloud backend"
+    - "Custom foundation model"
+    - "Dozens of integrations"
+    - "Automatic production deployment by default"
+
+  MVP_success:
+    task_set: "At least 50 difficult reproducible repository tasks."
+    comparisons:
+      - "Single-agent baseline"
+      - "Forge with one local model"
+      - "Forge with model routing"
+    metrics:
+      - "Verified success"
+      - "Regression rate"
+      - "Time"
+      - "Cost"
+      - "Human intervention"
+
+# ============================================================
+# 32. RECOMMENDED TECHNOLOGY STRATEGY
+# ============================================================
+
+technology:
+  core:
+    recommendation:
+      orchestration: "Python"
+      protocol_and_schemas: "JSON Schema"
+      desktop: "Tauri + React + TypeScript"
+      CLI: "Python"
+      local_database: "SQLite"
+      optional_server_database: "PostgreSQL"
+    rationale:
+      - "Python maximizes AI/tooling ecosystem and development speed."
+      - "TypeScript is strong for desktop/IDE UI."
+      - "SQLite keeps local mode free and simple."
+
+  indexing:
+    - "Tree-sitter or equivalent parsers"
+    - "SQLite metadata"
+    - "Vector index"
+    - "Graph tables"
+    - "Incremental indexing"
+
+  models:
+    local:
+      - "Ollama-compatible runtime"
+      - "Other OpenAI-compatible local runtimes"
+    cloud:
+      - "Provider adapters only"
+
+  execution:
+    local:
+      - "Native subprocess"
+      - "Restricted workspace"
+    stronger_isolation:
+      - "Docker"
+      - "VM"
+
+  integrations:
+    - "Git"
+    - "GitHub"
+    - "GitLab"
+    - "MCP-compatible tools"
+    - "VS Code"
+    - "JetBrains"
+
+# ============================================================
+# 33. PERFORMANCE TARGETS
+# ============================================================
+
+performance_targets:
+  startup:
+    target: "< 3 seconds for CLI core on a warm project"
+  repository_scan:
+    target: "Incremental after initial indexing"
+  context:
+    target: "No unnecessary whole-repository context dumps"
+  recovery:
+    target: "Resume from checkpoint after process interruption"
+  parallelism:
+    target: "Run independent agent tasks concurrently"
+  resource:
+    target: "Local mode must remain usable on consumer hardware where model capacity permits"
+
+# ============================================================
+# 34. FREE-FIRST DISTRIBUTION
+# ============================================================
+
+distribution:
+  license_goal: "Open-source"
+  editions:
+    community:
+      status: "Core"
+      features:
+        - "Local agent"
+        - "Local models"
+        - "All core tools"
+        - "Skills"
+        - "Repository intelligence"
+        - "Benchmarks"
+    optional_cloud:
+      status: "Adapter"
+      features:
+        - "External model providers"
+        - "Remote workers"
+    enterprise_future:
+      status: "Optional future layer"
+      rule: "Must not cripple community edition."
+
+# ============================================================
+# 35. QUALITY GATES
+# ============================================================
+
+non_negotiable:
+  - "No completion without evidence."
+  - "No random debugging loops."
+  - "No hidden destructive actions."
+  - "No secret leakage."
+  - "No test weakening."
+  - "No silent user-work destruction."
+  - "No mandatory paid API."
+  - "No provider lock-in."
+  - "No language lock-in."
+  - "No unnecessary context dumping."
+  - "No architecture changes without review."
+  - "No critical security issue left unresolved."
+  - "No benchmark claim without reproducible tasks."
+  - "No self-modification of security core without explicit approval."
+
+# ============================================================
+# 36. DEFINITION OF DONE
+# ============================================================
+
+definition_of_done:
+  feature:
+    - "Requirement satisfied"
+    - "Acceptance criteria verified"
+    - "Tests added/updated"
+    - "Build passes"
+    - "Relevant tests pass"
+    - "Diff reviewed"
+    - "Security reviewed where applicable"
+    - "Regression checked"
+    - "User-visible behavior verified where applicable"
+    - "Evidence stored"
+
+  bug:
+    - "Reproduced"
+    - "Root cause identified"
+    - "Correct fix implemented"
+    - "Regression test added"
+    - "Original reproduction passes"
+    - "Relevant suite passes"
+    - "Root cause recorded"
+
+  release:
+    - "All required checks pass"
+    - "No critical review findings"
+    - "Rollback path known"
+    - "Deployment verified"
+    - "Evidence stored"
+
+# ============================================================
+# 37. FINAL PRODUCT CONTRACT
+# ============================================================
+
+final_product:
+  user_input:
+    example: >
+      "Mere existing project me authentication add karo. Existing architecture
+      preserve karo, tests likho aur browser me verify karo."
+  forge_behavior:
+    - "Understand repository."
+    - "Detect architecture."
+    - "Research relevant existing patterns."
+    - "Write specification."
+    - "Create implementation plan."
+    - "Delegate independent tasks."
+    - "Implement."
+    - "Run tests."
+    - "Debug failures."
+    - "Review."
+    - "Security review."
+    - "Browser verification."
+    - "Regression."
+    - "Present evidence."
+  user_output:
+    - "What changed"
+    - "Why"
+    - "Files changed"
+    - "Tests"
+    - "Build status"
+    - "Security status"
+    - "Screenshots when relevant"
+    - "Known limitations"
+    - "Next action"
+
+  strategic_position:
+    - "Universal"
+    - "Free-first"
+    - "Local-first"
+    - "Open-source-first"
+    - "Model-agnostic"
+    - "Provider-agnostic"
+    - "Language-agnostic"
+    - "IDE-agnostic"
+    - "Evidence-driven"
+    - "Security-first"
+    - "Benchmark-driven"
+    - "Extensible"
+    - "Self-improving under controlled governance"
+
+# ============================================================
+# 38. RESEARCH REFERENCES
+# ============================================================
+
+research_sources:
+  - name: "gstack"
+    url: "https://github.com/garrytan/gstack"
+    used_for:
+      - "Specialist engineering roles"
+      - "Workflow discipline"
+      - "Browser QA"
+      - "Security/review/release concepts"
+
+  - name: "gstack architecture"
+    url: "https://github.com/garrytan/gstack/blob/main/ARCHITECTURE.md"
+    used_for:
+      - "Composable skill architecture"
+
+  - name: "Superpowers"
+    url: "https://github.com/obra/superpowers"
+    used_for:
+      - "Skills"
+      - "Planning"
+      - "TDD"
+      - "Systematic debugging"
+      - "Subagents"
+      - "Worktrees"
+      - "Verification"
+
+  - name: "OpenHands Software Agent SDK"
+    url: "https://github.com/OpenHands/software-agent-sdk"
+    used_for:
+      - "Agent server"
+      - "SDK"
+      - "Workspace isolation"
+      - "Scalable agent execution"
+
+  - name: "SWE-agent"
+    url: "https://github.com/SWE-agent/SWE-agent"
+    used_for:
+      - "Coding agent loop"
+      - "Tool interaction"
+      - "Benchmark methodology"
+
+  - name: "Aider"
+    url: "https://github.com/Aider-AI/aider"
+    used_for:
+      - "Repository map"
+      - "Context selection"
+
+  - name: "Cline"
+    url: "https://github.com/cline/cline"
+    used_for:
+      - "Extensibility"
+      - "MCP"
+      - "Subagent workflows"
+      - "Local/cloud models"
+
+  - name: "Gemini CLI"
+    url: "https://github.com/google-gemini/gemini-cli"
+    used_for:
+      - "Extensions"
+      - "Skills"
+      - "Hooks"
+      - "MCP"
+
+# ============================================================
+# MASTER RULE
+# ============================================================
+#
+# KMJ FORGE MUST NEVER BECOME:
+#   "A fancy chat box that writes code."
+#
+# KMJ FORGE MUST BECOME:
+#   "A universal, free-first, local-first AI software engineer
+#    that can reason about the whole software-development lifecycle."
+#
+# Priority order:
+#   1. UNIVERSALITY
+#   2. RELIABILITY
+#   3. VERIFICATION
+#   4. SECURITY
+#   5. LOCAL/FREE OPERATION
+#   6. PERFORMANCE
+#   7. EXTENSIBILITY
+#   8. UX
+#
+# ============================================================

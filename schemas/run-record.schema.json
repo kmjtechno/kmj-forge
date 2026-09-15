@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kmjtechno/kmj-forge/schemas/run-record.schema.json",
+  "title": "KMJ Forge Run Record",
+  "type": "object",
+  "required": [
+    "run_id",
+    "task_id",
+    "final_status"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files_read": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "retries": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "final_status": {
+      "type": "string",
+      "enum": [
+        "COMPLETE",
+        "BLOCKED",
+        "FAILED",
+        "ESCALATE"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

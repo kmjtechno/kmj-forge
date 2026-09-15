@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kmj-forge"
+version = "0.1.0"
+description = "Open-source, evidence-driven software engineering framework by KMJ TECHNO."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+  {name = "KMJ TECHNO"}
+]
+keywords = [
+  "software-engineering",
+  "developer-tools",
+  "agents",
+  "automation",
+  "testing",
+  "debugging",
+  "open-source"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/kmjtechno/kmj-forge"
+Repository = "https://github.com/kmjtechno/kmj-forge"
+Issues = "https://github.com/kmjtechno/kmj-forge/issues"
+
+[project.scripts]
+kmj-forge = "kmj_forge.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+site/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE/editor
+.idea/
+.vscode/
+.zed/settings.local.json
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs / local runtime
+*.log
+logs/
+tmp/
+temp/
+.cache/
+.local/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Build/package artifacts
+artifacts/
+packages/
+*.zip
+*.tar
+*.tar.gz
+
+# Benchmark local outputs
+benchmarks/results/
+benchmarks/.cache/
+
+# Local agent state
+.kmj-forge/state/
+.kmj-forge/cache/
+
+.worktrees/
+.superpowers/

@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose a scoped capability for KMJ Forge.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem being solved
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Describe observable, testable success criteria.
+    validations:
+      required: true
