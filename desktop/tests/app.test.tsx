@@ -136,7 +136,33 @@ describe("Forge Desktop Alpha workspace", () => {
     expect(within(status).getByText("3")).toBeInTheDocument();
   });
 
-  test("requires an explicit approval action and sends it to the persisted run", async () => {
+  test("clears repository-bound run state when the project path changes", async () => {
+    const request = vi.fn(async (operation: string) => {
+      if (operation !== "run_create") throw new Error(`unexpected operation ${operation}`);
+      return {
+        run_id: "run-old-project",
+        task_id: "desktop-task",
+        objective: "Safe change",
+        state: "receive",
+        history: ["receive"],
+        approvals: [],
+        evidence_count: 0,
+      };
+    });
+    renderAppWithRequest(request);
+
+    fireEvent.change(screen.getByLabelText("Project path"), { target: { value: "/repo-a" } });
+    fireEvent.change(screen.getByLabelText("Task objective"), { target: { value: "Safe change" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Run" }));
+    expect(await screen.findByText("run-old-project")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Project path"), { target: { value: "/repo-b" } });
+
+    expect(screen.queryByText("run-old-project")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Refresh Run" })).toBeDisabled();
+  });
+
+  test("limits explicit approvals to Forge Engine protected action classifications", async () => {
     const request = vi.fn(async (operation: string) => {
       if (operation === "run_create") {
         return {
@@ -156,7 +182,7 @@ describe("Forge Desktop Alpha workspace", () => {
           objective: "Safe change",
           state: "awaiting_approval",
           history: ["planning", "awaiting_approval"],
-          approvals: ["write_files"],
+          approvals: ["write"],
           evidence_count: 1,
         };
       }
@@ -164,21 +190,27 @@ describe("Forge Desktop Alpha workspace", () => {
     });
     renderAppWithRequest(request);
 
+    const approvalControl = screen.getByLabelText("Approval action");
+    expect(approvalControl.tagName).toBe("SELECT");
+    expect(within(approvalControl).getByRole("option", { name: "Write files" })).toHaveValue("write");
+    expect(within(approvalControl).getByRole("option", { name: "Run terminal commands" })).toHaveValue("terminal");
+    expect(within(approvalControl).getByRole("option", { name: "Git changes" })).toHaveValue("git");
+
     fireEvent.change(screen.getByLabelText("Project path"), { target: { value: "/repo" } });
     fireEvent.change(screen.getByLabelText("Task objective"), { target: { value: "Safe change" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Run" }));
     expect(await screen.findByText("run-7")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Approval action"), { target: { value: "write_files" } });
+    fireEvent.change(approvalControl, { target: { value: "write" } });
     fireEvent.click(screen.getByRole("button", { name: "Approve Action" }));
 
     await waitFor(() =>
       expect(request).toHaveBeenCalledWith("run_approve", {
         state_dir: "/repo/.kmj-forge",
         run_id: "run-7",
-        action: "write_files",
+        action: "write",
       }),
     );
-    expect(await screen.findByText("write_files")).toBeInTheDocument();
+    expect(await screen.findByText("write")).toBeInTheDocument();
   });
 });
