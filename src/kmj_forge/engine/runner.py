@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import platform
+import subprocess
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,6 +21,7 @@ class ApprovalRequiredError(PermissionError):
 AUTO_APPROVED_ACTIONS = frozenset({"read", "test"})
 PROTECTED_ACTIONS = frozenset({"write", "terminal", "git"})
 KNOWN_ACTIONS = AUTO_APPROVED_ACTIONS | PROTECTED_ACTIONS
+OUTPUT_LIMIT = 20_000
 
 
 def _utc_now() -> str:
@@ -78,6 +82,9 @@ class ForgeRunner:
         )
         if runner.snapshot.task_id != runner.task.task_id:
             raise ValueError("persisted snapshot task_id does not match task")
+        unknown_approvals = runner.approvals - PROTECTED_ACTIONS
+        if unknown_approvals:
+            raise ValueError(f"persisted state has unknown approvals: {sorted(unknown_approvals)}")
         return runner
 
     def _persist(self) -> None:
@@ -117,6 +124,65 @@ class ForgeRunner:
         self.evidence.append(record)
         self._persist()
 
+    def run_verification(
+        self,
+        command: tuple[str, ...],
+        *,
+        cwd: Path | None = None,
+        timeout_seconds: float = 300.0,
+    ) -> EvidenceRecord:
+        self.require_action("terminal")
+        if not isinstance(command, tuple) or not command or any(
+            not isinstance(part, str) or not part for part in command
+        ):
+            raise ValueError("command must be a non-empty tuple of non-empty strings")
+        if timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive")
+
+        resolved_cwd = Path(cwd or self.state_dir).resolve()
+        started = _utc_now()
+        try:
+            completed = subprocess.run(
+                list(command),
+                cwd=resolved_cwd,
+                shell=False,
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
+                check=False,
+            )
+            exit_code = completed.returncode
+            stdout = completed.stdout[-OUTPUT_LIMIT:]
+            stderr = completed.stderr[-OUTPUT_LIMIT:]
+            status = "PASS" if exit_code == 0 else "FAIL"
+        except subprocess.TimeoutExpired as exc:
+            exit_code = -1
+            stdout = (exc.stdout or "")[-OUTPUT_LIMIT:] if isinstance(exc.stdout, str) else ""
+            stderr = (exc.stderr or "")[-OUTPUT_LIMIT:] if isinstance(exc.stderr, str) else ""
+            status = "FAIL"
+
+        record = EvidenceRecord(
+            evidence_id=f"verification-{len(self.evidence) + 1}",
+            task_id=self.task.task_id,
+            kind="test",
+            status=status,
+            timestamp=started,
+            command=subprocess.list2cmdline(list(command)),
+            environment={
+                "cwd": str(resolved_cwd),
+                "platform": platform.system(),
+                "python": sys.version.split()[0],
+            },
+            details={
+                "argv": list(command),
+                "exit_code": exit_code,
+                "stdout": stdout,
+                "stderr": stderr,
+            },
+        )
+        self.record_evidence(record)
+        return record
+
     def complete(self) -> None:
         require_completion_evidence(self.evidence)
         self.transition(RunState.COMPLETE)
@@ -124,6 +190,7 @@ class ForgeRunner:
     def block(self, reason: str) -> None:
         if not isinstance(reason, str) or not reason.strip():
             raise ValueError("block reason must be a non-empty string")
+        blocked_snapshot = transition_state(self.snapshot, RunState.BLOCKED)
         record = EvidenceRecord(
             evidence_id=f"block-{len(self.evidence) + 1}",
             task_id=self.task.task_id,
@@ -132,8 +199,9 @@ class ForgeRunner:
             timestamp=_utc_now(),
             details={"reason": reason, "run_id": self.snapshot.run_id},
         )
-        self.record_evidence(record)
-        self.transition(RunState.BLOCKED)
+        self.snapshot = blocked_snapshot
+        self.evidence.append(record)
+        self._persist()
 
 
 __all__ = [
