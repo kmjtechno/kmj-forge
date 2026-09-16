@@ -2,7 +2,9 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { describe, expect, test, vi } from "vitest";
 import App from "../src/App";
 
-function renderAppWithRequest(request: ReturnType<typeof vi.fn>) {
+function renderAppWithRequest(
+  request: (operation: string, payload: Record<string, unknown>) => Promise<unknown>,
+) {
   const bridge = {
     request: async (operation: string, payload: Record<string, unknown>) => ({
       protocol_version: "1.0",
