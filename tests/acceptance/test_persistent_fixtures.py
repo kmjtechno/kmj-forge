@@ -13,18 +13,18 @@ FIXTURE_ROOT = Path(__file__).resolve().parents[2] / "benchmarks" / "fixtures"
 class PersistentFixtureAcceptanceTests(unittest.TestCase):
     def test_fixture_context_metrics_are_bounded_and_reproducible(self) -> None:
         cases = {
-            "python": ({"python"}, {"python"}),
-            "typescript": ({"typescript"}, {"npm"}),
-            "rust": ({"rust"}, {"cargo"}),
-            "mixed": ({"python", "typescript", "rust"}, {"python", "npm", "cargo"}),
+            "python": ("Change target_value safely", {"python"}, {"python"}),
+            "typescript": ("Change targetValue safely", {"typescript"}, {"npm"}),
+            "rust": ("Change target_value safely", {"rust"}, {"cargo"}),
+            "mixed": ("Change target_value safely", {"python", "typescript", "rust"}, {"python", "npm", "cargo"}),
         }
 
-        for name, (expected_languages, expected_builds) in cases.items():
+        for name, (objective, expected_languages, expected_builds) in cases.items():
             with self.subTest(name=name):
                 root = FIXTURE_ROOT / name
                 self.assertTrue(root.is_dir(), f"missing persistent benchmark fixture: {root}")
                 scan = scan_repository(root)
-                task = Task(task_id=f"persistent-{name}", objective="Change target_value safely")
+                task = Task(task_id=f"persistent-{name}", objective=objective)
                 packet = compile_context(task, scan, character_budget=400)
 
                 self.assertTrue(expected_languages.issubset(set(packet.detection.languages)))
