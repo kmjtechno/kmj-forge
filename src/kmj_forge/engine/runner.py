@@ -11,6 +11,7 @@ from pathlib import Path
 from kmj_forge.protocol import EvidenceRecord, Task
 
 from .evidence import VerificationRequiredError, latest_verification, require_completion_evidence
+from .planning import Plan, build_plan
 from .state import RunSnapshot, RunState, transition_state, validate_run_id
 
 
@@ -119,12 +120,14 @@ class ForgeRunner:
         state_dir: Path,
         evidence: list[EvidenceRecord] | None = None,
         approvals: set[str] | None = None,
+        plan: Plan | None = None,
     ) -> None:
         self.task = task
         self.snapshot = snapshot
         self.state_dir = Path(state_dir)
         self.evidence = list(evidence or [])
         self.approvals = set(approvals or set())
+        self.plan = plan or build_plan(task)
 
     @property
     def state_path(self) -> Path:
@@ -162,6 +165,7 @@ class ForgeRunner:
             state_dir=Path(state_dir),
             evidence=[EvidenceRecord.from_dict(item) for item in data.get("evidence", [])],
             approvals=set(data.get("approvals", [])),
+            plan=Plan.from_dict(data["plan"]) if "plan" in data else None,
         )
         if runner.snapshot.run_id != safe_run_id:
             raise ValueError("persisted snapshot run_id does not match requested run_id")
@@ -179,6 +183,7 @@ class ForgeRunner:
             "snapshot": self.snapshot.to_dict(),
             "evidence": [record.to_dict() for record in self.evidence],
             "approvals": sorted(self.approvals),
+            "plan": self.plan.to_dict(),
         }
         temporary = self.state_path.with_suffix(".json.tmp")
         temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -207,6 +212,10 @@ class ForgeRunner:
         self.snapshot = next_snapshot
         if stale_record is not None:
             self.evidence.append(stale_record)
+        self._persist()
+
+    def complete_plan_step(self, step_id: str) -> None:
+        self.plan = self.plan.complete_step(step_id)
         self._persist()
 
     def approve(self, action: str) -> None:
