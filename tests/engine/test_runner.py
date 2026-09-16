@@ -143,6 +143,36 @@ class ForgeRunnerTests(unittest.TestCase):
             self.assertEqual(recovered.evidence[-2].status, "PASS")
             self.assertEqual(recovered.evidence[-1].status, "FAIL")
 
+    def test_run_id_cannot_escape_state_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            state_dir = Path(tmp)
+            for unsafe in ("../escape", "nested/run", r"nested\run", ".."):
+                with self.subTest(run_id=unsafe):
+                    with self.assertRaises(ValueError):
+                        ForgeRunner.start(Task("task-1", "fix"), state_dir=state_dir, run_id=unsafe)
+                    with self.assertRaises(ValueError):
+                        ForgeRunner.load(state_dir, unsafe)
+
+    def test_retry_invalidates_old_pass_verification(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = ForgeRunner.start(Task("task-1", "fix"), state_dir=Path(tmp), run_id="run-8")
+            for state in REVIEW_PATH:
+                runner.transition(state)
+            runner.record_evidence(evidence("e-pass-old", "PASS"))
+
+            runner.transition(RunState.IMPLEMENT)
+            runner.transition(RunState.TEST)
+            runner.transition(RunState.REVIEW)
+
+            with self.assertRaises(VerificationRequiredError):
+                runner.complete()
+            self.assertEqual(runner.evidence[-1].kind, "verification")
+            self.assertEqual(runner.evidence[-1].status, "STALE")
+
+            runner.record_evidence(evidence("e-pass-new", "PASS"))
+            runner.complete()
+            self.assertEqual(runner.snapshot.state, RunState.COMPLETE)
+
 
 if __name__ == "__main__":
     unittest.main()
