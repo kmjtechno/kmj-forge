@@ -62,6 +62,16 @@ class AlphaAcceptanceGateTests(unittest.TestCase):
         self.assertEqual(runner_module.classify_command_risk(("git", "reset", "--hard")), "destructive")
         self.assertEqual(runner_module.classify_command_risk(("rm", "-rf", "/")), "destructive")
 
+    def test_destructive_command_is_rejected_before_verification_subprocess(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            task = Task(task_id="command-safety", objective="Reject destructive verification commands")
+            runner = ForgeRunner.start(task, state_dir=root / ".kmj-forge", run_id="command-safety-run")
+            runner.approve("terminal")
+            self.assertTrue(hasattr(runner_module, "UnsafeCommandError"))
+            with self.assertRaises(runner_module.UnsafeCommandError):
+                runner.run_verification(("git", "reset", "--hard"), cwd=root)
+
     def test_real_small_coding_task_can_edit_test_review_and_complete_with_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
