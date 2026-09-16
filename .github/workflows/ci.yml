@@ -50,10 +50,44 @@ jobs:
           node-version: "22"
           package-manager-cache: false
 
-      - name: Install desktop test dependencies
+      - name: Install desktop dependencies
         working-directory: desktop
         run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Run desktop contract tests
+      - name: Run desktop tests
         working-directory: desktop
         run: npm test
+
+      - name: Build desktop frontend
+        working-directory: desktop
+        run: npm run build
+
+  desktop-native:
+    name: desktop-native
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Rust toolchain evidence
+        run: rustc --version && cargo --version
+
+      - name: Test native bridge contract
+        run: cargo test --manifest-path desktop/src-tauri/Cargo.toml --tests
+
+      - name: Check Tauri crate
+        run: cargo check --manifest-path desktop/src-tauri/Cargo.toml
