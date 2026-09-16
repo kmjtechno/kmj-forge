@@ -33,6 +33,13 @@ class SkillDescriptor:
         return cls(data["skill_id"], data["description"], tuple(data["capabilities"]))
 
 
+@dataclass(frozen=True, slots=True)
+class SkillTrigger:
+    skill: SkillDescriptor
+    matched_capabilities: tuple[str, ...]
+    reason: str
+
+
 class SkillRegistry:
     def __init__(self, skills: Iterable[SkillDescriptor] = ()) -> None:
         indexed: dict[str, SkillDescriptor] = {}
@@ -65,5 +72,23 @@ class SkillRegistry:
             )
         return matched
 
+    def trigger_task(self, task: Task) -> tuple[SkillTrigger, ...]:
+        requested = set(task.requested_capabilities)
+        skills = self.resolve_task(task)
+        triggers = []
+        for skill in skills:
+            matched = tuple(sorted(requested & set(skill.capabilities)))
+            triggers.append(SkillTrigger(
+                skill=skill,
+                matched_capabilities=matched,
+                reason=f"requested capabilities: {', '.join(matched)}",
+            ))
+        return tuple(triggers)
 
-__all__ = ["SkillDescriptor", "SkillRegistry", "SkillResolutionError"]
+
+__all__ = [
+    "SkillDescriptor",
+    "SkillRegistry",
+    "SkillResolutionError",
+    "SkillTrigger",
+]
