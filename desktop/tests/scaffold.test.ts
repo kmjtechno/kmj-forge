@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const desktopRoot = fileURLToPath(new URL("../", import.meta.url));
+const desktopRoot = process.cwd();
 
 const requiredFiles = [
   "src/App.tsx",
@@ -18,6 +18,6 @@ const requiredFiles = [
 
 describe("Forge Desktop Alpha scaffold", () => {
   test.each(requiredFiles)("provides %s", (relativePath) => {
-    expect(existsSync(`${desktopRoot}${relativePath}`)).toBe(true);
+    expect(existsSync(resolve(desktopRoot, relativePath))).toBe(true);
   });
 });
