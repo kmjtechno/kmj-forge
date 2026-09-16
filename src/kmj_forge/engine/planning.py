@@ -66,6 +66,25 @@ class Plan:
         return tuple(step.step_id for step in self.steps
                      if not step.completed and set(step.dependencies) <= done)
 
+    def is_executable(self) -> bool:
+        """Return whether the plan has a valid runnable path to completion."""
+        remaining = {step.step_id for step in self.steps if not step.completed}
+        completed = {step.step_id for step in self.steps if step.completed}
+        while remaining:
+            ready = {
+                step.step_id for step in self.steps
+                if step.step_id in remaining and set(step.dependencies) <= completed
+            }
+            if not ready:
+                return False
+            remaining -= ready
+            completed |= ready
+        return True
+
+    def verification_criteria(self) -> tuple[str, ...]:
+        """Expose the persisted acceptance criteria used by verification."""
+        return self.acceptance_criteria
+
     def complete_step(self, step_id: str) -> "Plan":
         step = self.step(step_id)
         done = {item.step_id for item in self.steps if item.completed}
