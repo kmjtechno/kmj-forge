@@ -165,6 +165,7 @@ export default function App({ bridge = defaultBridge }: { bridge?: ForgeBridge }
         <section className="agent-status" aria-label="Agent status">
           <span><small>Policy</small><strong>FREE_ONLY</strong></span>
           <span><small>Model</small><strong>Not selected</strong></span>
+          <span><small>Fallback</small><strong>None</strong></span>
           <span><small>Context</small><strong>{contextStatus}</strong></span>
           <span><small>State</small><strong>{run?.state ?? "RECEIVE"}</strong></span>
           <span><small>Evidence</small><strong>{run?.evidence_count ?? 0}</strong></span>
