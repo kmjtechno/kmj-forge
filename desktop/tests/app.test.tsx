@@ -28,6 +28,7 @@ describe("Forge Desktop Alpha workspace", () => {
     const status = screen.getByRole("region", { name: "Agent status" });
     expect(within(status).getByText("FREE_ONLY")).toBeInTheDocument();
     expect(within(status).getByText(/Model/i)).toBeInTheDocument();
+    expect(within(status).getByText(/Fallback/i)).toBeInTheDocument();
     expect(within(status).getByText(/Context/i)).toBeInTheDocument();
     expect(within(status).getByText(/State/i)).toBeInTheDocument();
     expect(within(status).getByText(/Evidence/i)).toBeInTheDocument();
