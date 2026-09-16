@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
+
+
+RUN_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 
 
 class RunState(str, Enum):
@@ -32,6 +36,14 @@ _ALLOWED_TRANSITIONS: dict[RunState, frozenset[RunState]] = {
 }
 
 
+def validate_run_id(run_id: str) -> str:
+    if not isinstance(run_id, str) or RUN_ID_PATTERN.fullmatch(run_id) is None:
+        raise ValueError(
+            "run_id must be 1-128 characters using only letters, digits, '.', '_' or '-', and start with a letter or digit"
+        )
+    return run_id
+
+
 @dataclass(frozen=True, slots=True)
 class RunSnapshot:
     run_id: str
@@ -40,8 +52,7 @@ class RunSnapshot:
     history: tuple[RunState, ...]
 
     def __post_init__(self) -> None:
-        if not isinstance(self.run_id, str) or not self.run_id.strip():
-            raise ValueError("run_id must be a non-empty string")
+        validate_run_id(self.run_id)
         if not isinstance(self.task_id, str) or not self.task_id.strip():
             raise ValueError("task_id must be a non-empty string")
         if not self.history or self.history[-1] is not self.state:

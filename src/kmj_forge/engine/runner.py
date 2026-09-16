@@ -10,8 +10,8 @@ from pathlib import Path
 
 from kmj_forge.protocol import EvidenceRecord, Task
 
-from .evidence import VerificationRequiredError, require_completion_evidence
-from .state import RunSnapshot, RunState, transition_state
+from .evidence import VerificationRequiredError, latest_verification, require_completion_evidence
+from .state import RunSnapshot, RunState, transition_state, validate_run_id
 
 
 class ApprovalRequiredError(PermissionError):
@@ -22,6 +22,7 @@ AUTO_APPROVED_ACTIONS = frozenset({"read", "test"})
 PROTECTED_ACTIONS = frozenset({"write", "terminal", "git"})
 KNOWN_ACTIONS = AUTO_APPROVED_ACTIONS | PROTECTED_ACTIONS
 OUTPUT_LIMIT = 20_000
+PASS_STATUSES = frozenset({"PASS", "SUCCESS", "OK"})
 
 
 def _utc_now() -> str:
@@ -56,7 +57,7 @@ class ForgeRunner:
         state_dir: Path,
         run_id: str | None = None,
     ) -> "ForgeRunner":
-        resolved_run_id = run_id or uuid.uuid4().hex
+        resolved_run_id = validate_run_id(run_id or uuid.uuid4().hex)
         snapshot = RunSnapshot(
             run_id=resolved_run_id,
             task_id=task.task_id,
@@ -71,7 +72,8 @@ class ForgeRunner:
 
     @classmethod
     def load(cls, state_dir: Path, run_id: str) -> "ForgeRunner":
-        path = Path(state_dir) / f"{run_id}.json"
+        safe_run_id = validate_run_id(run_id)
+        path = Path(state_dir) / f"{safe_run_id}.json"
         data = json.loads(path.read_text(encoding="utf-8"))
         runner = cls(
             task=Task.from_dict(data["task"]),
@@ -80,6 +82,8 @@ class ForgeRunner:
             evidence=[EvidenceRecord.from_dict(item) for item in data.get("evidence", [])],
             approvals=set(data.get("approvals", [])),
         )
+        if runner.snapshot.run_id != safe_run_id:
+            raise ValueError("persisted snapshot run_id does not match requested run_id")
         if runner.snapshot.task_id != runner.task.task_id:
             raise ValueError("persisted snapshot task_id does not match task")
         unknown_approvals = runner.approvals - PROTECTED_ACTIONS
@@ -100,7 +104,28 @@ class ForgeRunner:
         temporary.replace(self.state_path)
 
     def transition(self, target: RunState) -> None:
-        self.snapshot = transition_state(self.snapshot, target)
+        next_snapshot = transition_state(self.snapshot, target)
+        stale_record: EvidenceRecord | None = None
+        latest = latest_verification(self.evidence)
+        if (
+            target is RunState.IMPLEMENT
+            and latest is not None
+            and latest.status.upper() in PASS_STATUSES
+        ):
+            stale_record = EvidenceRecord(
+                evidence_id=f"verification-stale-{len(self.evidence) + 1}",
+                task_id=self.task.task_id,
+                kind="verification",
+                status="STALE",
+                timestamp=_utc_now(),
+                details={
+                    "reason": "implementation resumed after passing verification",
+                    "run_id": self.snapshot.run_id,
+                },
+            )
+        self.snapshot = next_snapshot
+        if stale_record is not None:
+            self.evidence.append(stale_record)
         self._persist()
 
     def approve(self, action: str) -> None:
