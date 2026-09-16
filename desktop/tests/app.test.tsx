@@ -38,9 +38,9 @@ describe("Forge Desktop Alpha workspace", () => {
     expect(screen.getByLabelText("Project path")).toBeInTheDocument();
     expect(screen.getByLabelText("Task objective")).toBeInTheDocument();
     const approvals = screen.getByRole("region", { name: "Approvals" });
-    expect(within(approvals).getByText(/Write/i)).toBeInTheDocument();
-    expect(within(approvals).getByText(/Terminal/i)).toBeInTheDocument();
-    expect(within(approvals).getByText(/Git/i)).toBeInTheDocument();
+    expect(within(approvals).getByText("Write — Pending")).toBeInTheDocument();
+    expect(within(approvals).getByText("Terminal — Pending")).toBeInTheDocument();
+    expect(within(approvals).getByText("Git — Pending")).toBeInTheDocument();
   });
 
   test("inspects a repository through the Forge bridge and renders context evidence", async () => {
