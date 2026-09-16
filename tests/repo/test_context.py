@@ -41,6 +41,15 @@ class ContextCompilerTests(unittest.TestCase):
             self.assertLess(packet.total_characters, naive)
             self.assertIn("target.py", packet.relevant_files)
 
+    def test_metadata_larger_than_budget_is_rejected_instead_of_silently_overrunning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "app.py").write_text("VALUE = 1\n", encoding="utf-8")
+            task = Task(task_id="t-budget", objective="x" * 100)
+
+            with self.assertRaisesRegex(ValueError, "metadata exceeds context budget"):
+                compile_context(task, scan_repository(root), character_budget=20)
+
     def test_packet_carries_permissions_diff_and_diagnostics_verbatim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
