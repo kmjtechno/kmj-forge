@@ -21,10 +21,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -36,3 +36,24 @@ jobs:
 
       - name: Test
         run: python -m unittest discover -s tests -v
+
+  desktop-contract:
+    name: desktop-alpha
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Install desktop test dependencies
+        working-directory: desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Run desktop contract tests
+        working-directory: desktop
+        run: npm test
