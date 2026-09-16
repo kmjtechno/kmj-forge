@@ -29,6 +29,11 @@ interface RunSummary {
 const defaultPlan = ["Classify task", "Discover repository context", "Propose verified change"];
 const defaultTimeline = ["Run ready", "Awaiting task"];
 const defaultApprovals = ["Write — Pending", "Terminal — Pending", "Git — Pending"];
+const protectedApprovalOptions = [
+  { value: "write", label: "Write files" },
+  { value: "terminal", label: "Run terminal commands" },
+  { value: "git", label: "Git changes" },
+] as const;
 
 function Panel({ name, children, className = "" }: { name: string; children: ReactNode; className?: string }) {
   return (
@@ -62,6 +67,16 @@ export default function App({ bridge = defaultBridge }: { bridge?: ForgeBridge }
 
   const stateDir = useMemo(() => stateDirectory(projectPath), [projectPath]);
   const canStart = Boolean(projectPath.trim() && objective.trim());
+
+  function changeProjectPath(nextPath: string) {
+    if (nextPath !== projectPath) {
+      setInspection(null);
+      setRun(null);
+      setApprovalAction("");
+      setError(null);
+    }
+    setProjectPath(nextPath);
+  }
 
   async function inspectProject() {
     if (!canStart) return;
@@ -168,7 +183,7 @@ export default function App({ bridge = defaultBridge }: { bridge?: ForgeBridge }
                 aria-label="Project path"
                 placeholder="Open a repository…"
                 value={projectPath}
-                onChange={(event) => setProjectPath(event.target.value)}
+                onChange={(event) => changeProjectPath(event.target.value)}
               />
             </label>
             <div className="panel-actions">
@@ -243,15 +258,19 @@ export default function App({ bridge = defaultBridge }: { bridge?: ForgeBridge }
             </ul>
             <label className="field approval-field">
               Approval action
-              <input
+              <select
                 aria-label="Approval action"
-                placeholder="e.g. write_files"
                 value={approvalAction}
                 onChange={(event) => setApprovalAction(event.target.value)}
-              />
+              >
+                <option value="">Choose protected action…</option>
+                {protectedApprovalOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </label>
             <div className="panel-actions">
-              <button type="button" onClick={approveAction} disabled={!run || !approvalAction.trim() || busy !== null}>Approve Action</button>
+              <button type="button" onClick={approveAction} disabled={!run || !approvalAction || busy !== null}>Approve Action</button>
             </div>
           </Panel>
         </aside>
