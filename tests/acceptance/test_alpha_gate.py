@@ -103,6 +103,8 @@ class AlphaAcceptanceGateTests(unittest.TestCase):
             )
             self.assertEqual(verification.status, "PASS")
             runner.transition(RunState.REVIEW)
+            for step_id in ("discover", "implement", "verify", "review"):
+                runner.complete_plan_step(step_id)
             runner.complete()
 
             self.assertEqual(runner.snapshot.state, RunState.COMPLETE)
