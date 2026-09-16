@@ -18,6 +18,10 @@ class ApprovalRequiredError(PermissionError):
     pass
 
 
+class UnsafeCommandError(PermissionError):
+    pass
+
+
 AUTO_APPROVED_ACTIONS = frozenset({"read", "test"})
 PROTECTED_ACTIONS = frozenset({"write", "terminal", "git"})
 KNOWN_ACTIONS = AUTO_APPROVED_ACTIONS | PROTECTED_ACTIONS
@@ -27,6 +31,65 @@ PASS_STATUSES = frozenset({"PASS", "SUCCESS", "OK"})
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _command_parts(command: tuple[str, ...]) -> tuple[str, tuple[str, ...]]:
+    if not isinstance(command, tuple) or not command or any(
+        not isinstance(part, str) or not part for part in command
+    ):
+        raise ValueError("command must be a non-empty tuple of non-empty strings")
+    executable = Path(command[0]).name.lower()
+    return executable, tuple(part.lower() for part in command[1:])
+
+
+def classify_command_risk(command: tuple[str, ...]) -> str:
+    executable, args = _command_parts(command)
+    joined = " ".join(args)
+
+    if executable in {"rm", "rmdir", "del", "erase", "format", "shutdown", "reboot"}:
+        return "destructive"
+
+    if executable in {"git", "git.exe"} and args:
+        subcommand = args[0]
+        if subcommand == "reset" and "--hard" in args:
+            return "destructive"
+        if subcommand == "clean" and any("f" in arg.lstrip("-") for arg in args[1:] if arg.startswith("-")):
+            return "destructive"
+
+    if executable in {"powershell", "powershell.exe", "pwsh", "pwsh.exe"}:
+        destructive_terms = (
+            "remove-item",
+            "format-volume",
+            "clear-disk",
+            "stop-computer",
+            "restart-computer",
+        )
+        if any(term in joined for term in destructive_terms):
+            return "destructive"
+
+    if executable in {"cmd", "cmd.exe"}:
+        destructive_terms = (" del ", " erase ", " rmdir ", " rd ", " format ", " shutdown ")
+        padded = f" {joined} "
+        if any(term in padded for term in destructive_terms):
+            return "destructive"
+
+    if executable.startswith("python") and "-m" in args:
+        module_index = args.index("-m") + 1
+        if module_index < len(args) and args[module_index] in {"unittest", "pytest", "compileall"}:
+            return "verification"
+    if executable in {"pytest", "pytest.exe"}:
+        return "verification"
+    if executable in {"cargo", "cargo.exe"} and args and args[0] in {"test", "check"}:
+        return "verification"
+    if executable in {"npm", "npm.cmd", "yarn", "yarn.cmd", "pnpm", "pnpm.cmd"} and args:
+        if args[0] == "test" or args[:2] in (("run", "test"), ("run", "build")):
+            return "verification"
+    if executable in {"go", "go.exe", "dotnet", "dotnet.exe"} and args and args[0] == "test":
+        return "verification"
+    if executable in {"mvn", "mvn.cmd", "gradle", "gradle.bat", "gradlew", "gradlew.bat"} and "test" in args:
+        return "verification"
+
+    return "protected"
 
 
 class ForgeRunner:
@@ -149,6 +212,56 @@ class ForgeRunner:
         self.evidence.append(record)
         self._persist()
 
+    def write_text_file(
+        self,
+        workspace_root: str | Path,
+        relative_path: str,
+        content: str,
+    ) -> EvidenceRecord:
+        self.require_action("write")
+        if self.snapshot.state is not RunState.IMPLEMENT:
+            raise RuntimeError("text edits are only allowed in IMPLEMENT state")
+        if not isinstance(relative_path, str) or not relative_path.strip():
+            raise ValueError("relative_path must be a non-empty string")
+        if not isinstance(content, str):
+            raise TypeError("content must be a string")
+
+        root = Path(workspace_root).expanduser().resolve()
+        if not root.is_dir():
+            raise ValueError(f"workspace root is not a directory: {root}")
+
+        relative = Path(relative_path)
+        if relative.is_absolute() or relative == Path(".") or ".." in relative.parts:
+            raise ValueError("relative_path must stay inside the workspace")
+
+        target = (root / relative).resolve()
+        try:
+            target.relative_to(root)
+        except ValueError as exc:
+            raise ValueError("relative_path escapes the workspace") from exc
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temporary = target.parent / f".{target.name}.kmj-forge.tmp"
+        temporary.write_text(content, encoding="utf-8")
+        temporary.replace(target)
+
+        normalized_path = target.relative_to(root).as_posix()
+        record = EvidenceRecord(
+            evidence_id=f"change-{len(self.evidence) + 1}",
+            task_id=self.task.task_id,
+            kind="change",
+            status="PASS",
+            timestamp=_utc_now(),
+            changed_files=(normalized_path,),
+            details={
+                "operation": "write_text_file",
+                "characters": len(content),
+                "run_id": self.snapshot.run_id,
+            },
+        )
+        self.record_evidence(record)
+        return record
+
     def run_verification(
         self,
         command: tuple[str, ...],
@@ -157,12 +270,13 @@ class ForgeRunner:
         timeout_seconds: float = 300.0,
     ) -> EvidenceRecord:
         self.require_action("terminal")
-        if not isinstance(command, tuple) or not command or any(
-            not isinstance(part, str) or not part for part in command
-        ):
-            raise ValueError("command must be a non-empty tuple of non-empty strings")
+        _command_parts(command)
         if timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
+        if classify_command_risk(command) == "destructive":
+            raise UnsafeCommandError(
+                f"destructive command is not allowed in verification: {subprocess.list2cmdline(list(command))}"
+            )
 
         resolved_cwd = Path(cwd or self.state_dir).resolve()
         started = _utc_now()
@@ -232,5 +346,7 @@ class ForgeRunner:
 __all__ = [
     "ApprovalRequiredError",
     "ForgeRunner",
+    "UnsafeCommandError",
     "VerificationRequiredError",
+    "classify_command_risk",
 ]
