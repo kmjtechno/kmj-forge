@@ -22,6 +22,12 @@ REVIEW_PATH = (
 )
 
 
+def complete_plan(runner: ForgeRunner) -> None:
+    for step_id in ("discover", "implement", "verify", "review"):
+        if not runner.plan.step(step_id).completed:
+            runner.complete_plan_step(step_id)
+
+
 def evidence(evidence_id: str, status: str) -> EvidenceRecord:
     return EvidenceRecord(
         evidence_id=evidence_id,
@@ -83,6 +89,7 @@ class ForgeRunnerTests(unittest.TestCase):
                 runner.complete()
 
             runner.record_evidence(evidence("e-pass", "PASS"))
+            complete_plan(runner)
             runner.complete()
             self.assertEqual(runner.snapshot.state, RunState.COMPLETE)
 
@@ -105,6 +112,7 @@ class ForgeRunnerTests(unittest.TestCase):
             for state in REVIEW_PATH:
                 runner.transition(state)
             runner.record_evidence(evidence("e-pass", "PASS"))
+            complete_plan(runner)
             runner.complete()
             before = tuple(runner.evidence)
 
@@ -170,6 +178,23 @@ class ForgeRunnerTests(unittest.TestCase):
             self.assertEqual(runner.evidence[-1].status, "STALE")
 
             runner.record_evidence(evidence("e-pass-new", "PASS"))
+            complete_plan(runner)
+            runner.complete()
+            self.assertEqual(runner.snapshot.state, RunState.COMPLETE)
+
+
+    def test_completion_requires_executable_plan_to_be_complete(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = ForgeRunner.start(Task("task-1", "fix"), state_dir=Path(tmp), run_id="run-plan-gate")
+            for state in REVIEW_PATH:
+                runner.transition(state)
+            runner.record_evidence(evidence("e-pass", "PASS"))
+
+            with self.assertRaisesRegex(VerificationRequiredError, "executable plan"):
+                runner.complete()
+
+            for step_id in ("discover", "implement", "verify", "review"):
+                runner.complete_plan_step(step_id)
             runner.complete()
             self.assertEqual(runner.snapshot.state, RunState.COMPLETE)
 

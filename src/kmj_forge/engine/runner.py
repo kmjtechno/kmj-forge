@@ -351,6 +351,11 @@ class ForgeRunner:
 
     def complete(self) -> None:
         require_completion_evidence(self.evidence)
+        incomplete = tuple(step.step_id for step in self.plan.steps if not step.completed)
+        if incomplete:
+            raise VerificationRequiredError(
+                f"completion requires executable plan to be complete; remaining steps: {', '.join(incomplete)}"
+            )
         self.transition(RunState.COMPLETE)
 
     def block(self, reason: str) -> None:
