@@ -21,10 +21,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -36,3 +36,122 @@ jobs:
 
       - name: Test
         run: python -m unittest discover -s tests -v
+
+  desktop-contract:
+    name: desktop-alpha
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Run desktop tests
+        working-directory: desktop
+        run: npm test
+
+      - name: Build desktop frontend
+        working-directory: desktop
+        run: npm run build
+
+  desktop-native:
+    name: desktop-native
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python for Forge bridge
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Forge engine
+        run: python -m pip install -e .
+
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Rust toolchain evidence
+        run: rustc --version && cargo --version
+
+      - name: Test native bridge contract
+        run: cargo test --manifest-path desktop/src-tauri/Cargo.toml --tests
+
+      - name: Check Tauri crate
+        run: cargo check --manifest-path desktop/src-tauri/Cargo.toml
+
+  desktop-windows:
+    name: desktop-windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python for Forge bridge
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Forge engine
+        run: python -m pip install -e .
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Rust toolchain evidence
+        run: rustc --version; cargo --version
+
+      - name: Build Windows desktop executable
+        working-directory: desktop
+        run: npm run tauri -- build --no-bundle
+
+      - name: Launch smoke Windows desktop
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD "desktop\src-tauri\target\release\kmj-forge-desktop.exe"
+          if (-not (Test-Path $exe)) {
+            throw "Expected Windows executable was not produced: $exe"
+          }
+          $process = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 5
+          $process.Refresh()
+          if ($process.HasExited) {
+            throw "KMJ Forge Desktop exited during smoke test with code $($process.ExitCode)"
+          }
+          Stop-Process -Id $process.Id -Force
+          Write-Host "KMJ Forge Desktop launch smoke passed."
+
+      - name: Upload Windows alpha executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmj-forge-desktop-windows-alpha
+          path: desktop/src-tauri/target/release/kmj-forge-desktop.exe
+          if-no-files-found: error
+          retention-days: 7
