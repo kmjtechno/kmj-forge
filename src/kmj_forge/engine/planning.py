@@ -32,6 +32,8 @@ class PlanStep:
 class Plan:
     task_id: str
     steps: tuple[PlanStep, ...]
+    acceptance_criteria: tuple[str, ...] = ()
+    constraints: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.task_id.strip() or not self.steps:
@@ -53,36 +55,48 @@ class Plan:
                 raise ValueError("plan dependency graph must be acyclic")
             remaining -= ready
 
+    def step(self, step_id: str) -> PlanStep:
+        for step in self.steps:
+            if step.step_id == step_id:
+                return step
+        raise KeyError(step_id)
+
     def ready_step_ids(self) -> tuple[str, ...]:
         done = {step.step_id for step in self.steps if step.completed}
         return tuple(step.step_id for step in self.steps
                      if not step.completed and set(step.dependencies) <= done)
 
     def complete_step(self, step_id: str) -> "Plan":
-        matches = [step for step in self.steps if step.step_id == step_id]
-        if not matches:
-            raise KeyError(step_id)
-        step = matches[0]
+        step = self.step(step_id)
         done = {item.step_id for item in self.steps if item.completed}
         if not set(step.dependencies) <= done:
             raise ValueError("step dependencies are not complete")
         updated = tuple(replace(item, completed=True) if item.step_id == step_id else item
                         for item in self.steps)
-        return Plan(self.task_id, updated)
+        return replace(self, steps=updated)
 
     def to_dict(self) -> dict[str, Any]:
-        return {"task_id": self.task_id, "steps": [step.to_dict() for step in self.steps]}
+        return {"task_id": self.task_id, "steps": [step.to_dict() for step in self.steps],
+                "acceptance_criteria": list(self.acceptance_criteria),
+                "constraints": list(self.constraints)}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Plan":
-        return cls(data["task_id"], tuple(PlanStep.from_dict(item) for item in data["steps"]))
+        return cls(data["task_id"], tuple(PlanStep.from_dict(item) for item in data["steps"]),
+                   tuple(data.get("acceptance_criteria", ())),
+                   tuple(data.get("constraints", ())))
 
+
+def _join(items: tuple[str, ...], fallback: str) -> str:
+    return "; ".join(items) if items else fallback
 
 def build_plan(task: Task) -> Plan:
+    constraints = _join(task.constraints, "declared task constraints")
+    acceptance = _join(task.acceptance_criteria, "declared acceptance criteria")
     steps = (
         PlanStep("discover", f"Discover repository context for: {task.objective}"),
-        PlanStep("implement", f"Implement: {task.objective}", ("discover",)),
-        PlanStep("verify", "Verify acceptance criteria and constraints", ("implement",)),
+        PlanStep("implement", f"Implement: {task.objective}. Constraints: {constraints}", ("discover",)),
+        PlanStep("verify", f"Verify acceptance criteria: {acceptance}", ("implement",)),
         PlanStep("review", "Review evidence and completion gates", ("verify",)),
     )
-    return Plan(task.task_id, steps)
+    return Plan(task.task_id, steps, task.acceptance_criteria, task.constraints)
