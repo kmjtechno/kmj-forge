@@ -27,6 +27,19 @@ PROTECTED_ACTIONS = frozenset({"write", "terminal", "git"})
 KNOWN_ACTIONS = AUTO_APPROVED_ACTIONS | PROTECTED_ACTIONS
 OUTPUT_LIMIT = 20_000
 PASS_STATUSES = frozenset({"PASS", "SUCCESS", "OK"})
+POSIX_SHELLS = frozenset({"bash", "sh", "zsh", "dash", "ksh"})
+POSIX_DESTRUCTIVE_PATTERNS = (
+    "rm ",
+    "rm\t",
+    "rmdir ",
+    "git reset --hard",
+    "git clean -f",
+    "git clean -df",
+    "git clean -fd",
+    "mkfs",
+    "shutdown",
+    "reboot",
+)
 
 
 def _utc_now() -> str:
@@ -54,6 +67,11 @@ def classify_command_risk(command: tuple[str, ...]) -> str:
         if subcommand == "reset" and "--hard" in args:
             return "destructive"
         if subcommand == "clean" and any("f" in arg.lstrip("-") for arg in args[1:] if arg.startswith("-")):
+            return "destructive"
+
+    if executable in POSIX_SHELLS and args:
+        shell_text = joined
+        if any(pattern in shell_text for pattern in POSIX_DESTRUCTIVE_PATTERNS):
             return "destructive"
 
     if executable in {"powershell", "powershell.exe", "pwsh", "pwsh.exe"}:
