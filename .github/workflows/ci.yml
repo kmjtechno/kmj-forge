@@ -149,7 +149,7 @@ jobs:
           Write-Host "KMJ Forge Desktop launch smoke passed."
 
       - name: Upload Windows alpha executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kmj-forge-desktop-windows-alpha
           path: desktop/src-tauri/target/release/kmj-forge-desktop.exe
