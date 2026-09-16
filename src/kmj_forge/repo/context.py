@@ -110,7 +110,11 @@ def compile_context(
     tokens = _task_tokens(task)
     ranked = sorted(scan.files, key=lambda item: (-_score(item, tokens), item.path))
     fixed_chars = _metadata_characters(task, permissions, git_diff, diagnostics)
-    remaining = max(0, character_budget - fixed_chars)
+    if fixed_chars > character_budget:
+        raise ValueError(
+            f"metadata exceeds context budget: required={fixed_chars} budget={character_budget}"
+        )
+    remaining = character_budget - fixed_chars
     snippets: list[ContextSnippet] = []
 
     for item in ranked:
