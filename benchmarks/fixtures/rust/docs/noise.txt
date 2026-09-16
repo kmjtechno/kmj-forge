@@ -1,0 +1,5 @@
+Generic Rust fixture documentation. The benchmark uses this repeated prose to prove the context compiler selects a bounded packet rather than blindly sending the whole repository.
+Generic Rust fixture documentation. The benchmark uses this repeated prose to prove the context compiler selects a bounded packet rather than blindly sending the whole repository.
+Generic Rust fixture documentation. The benchmark uses this repeated prose to prove the context compiler selects a bounded packet rather than blindly sending the whole repository.
+Generic Rust fixture documentation. The benchmark uses this repeated prose to prove the context compiler selects a bounded packet rather than blindly sending the whole repository.
+Generic Rust fixture documentation. The benchmark uses this repeated prose to prove the context compiler selects a bounded packet rather than blindly sending the whole repository.
