@@ -1,0 +1,5 @@
+{
+  "name": "kmj-forge-typescript-fixture",
+  "private": true,
+  "scripts": {"test": "echo fixture-test"}
+}

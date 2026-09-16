@@ -1,0 +1,5 @@
+Mixed-project non-task documentation used only to increase naive context size. The compiler should preserve task-relevant files while remaining under its character budget.
+Mixed-project non-task documentation used only to increase naive context size. The compiler should preserve task-relevant files while remaining under its character budget.
+Mixed-project non-task documentation used only to increase naive context size. The compiler should preserve task-relevant files while remaining under its character budget.
+Mixed-project non-task documentation used only to increase naive context size. The compiler should preserve task-relevant files while remaining under its character budget.
+Mixed-project non-task documentation used only to increase naive context size. The compiler should preserve task-relevant files while remaining under its character budget.
