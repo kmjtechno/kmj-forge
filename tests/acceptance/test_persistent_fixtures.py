@@ -37,6 +37,19 @@ class PersistentFixtureAcceptanceTests(unittest.TestCase):
                     f"task-relevant implementation missing from context: {packet.relevant_files}",
                 )
 
+                reduction_pct = round(
+                    100.0 * (1.0 - (packet.total_characters / packet.naive_characters)),
+                    2,
+                )
+                print(
+                    "KMJ_FORGE_CONTEXT_METRIC "
+                    f"fixture={name} "
+                    f"naive_chars={packet.naive_characters} "
+                    f"selected_chars={packet.total_characters} "
+                    f"reduction_pct={reduction_pct:.2f} "
+                    f"relevant_files={','.join(packet.relevant_files)}"
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
