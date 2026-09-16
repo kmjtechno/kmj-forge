@@ -1,3 +1,4 @@
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -5,6 +6,7 @@ from pathlib import Path
 from kmj_forge.engine import (
     ApprovalRequiredError,
     ForgeRunner,
+    InvalidTransitionError,
     RunState,
     VerificationRequiredError,
 )
@@ -95,6 +97,51 @@ class ForgeRunnerTests(unittest.TestCase):
             self.assertEqual(runner.snapshot.state, RunState.BLOCKED)
             self.assertEqual(runner.evidence[-1].kind, "block")
             self.assertEqual(runner.evidence[-1].details["reason"], "missing dependency")
+
+    def test_block_on_terminal_run_is_atomic_and_does_not_add_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            state_dir = Path(tmp)
+            runner = ForgeRunner.start(Task("task-1", "fix"), state_dir=state_dir, run_id="run-5")
+            for state in REVIEW_PATH:
+                runner.transition(state)
+            runner.record_evidence(evidence("e-pass", "PASS"))
+            runner.complete()
+            before = tuple(runner.evidence)
+
+            with self.assertRaises(InvalidTransitionError):
+                runner.block("too late")
+
+            self.assertEqual(tuple(runner.evidence), before)
+            recovered = ForgeRunner.load(state_dir, "run-5")
+            self.assertEqual(recovered.snapshot.state, RunState.COMPLETE)
+            self.assertEqual(tuple(recovered.evidence), before)
+
+    def test_verification_execution_requires_terminal_approval(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = ForgeRunner.start(Task("task-1", "verify"), state_dir=Path(tmp), run_id="run-6")
+            with self.assertRaises(ApprovalRequiredError):
+                runner.run_verification((sys.executable, "-c", "print('ok')"))
+
+    def test_verification_execution_records_pass_and_fail_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            state_dir = Path(tmp)
+            runner = ForgeRunner.start(Task("task-1", "verify"), state_dir=state_dir, run_id="run-7")
+            runner.approve("terminal")
+
+            passed = runner.run_verification((sys.executable, "-c", "print('ok')"), cwd=state_dir)
+            failed = runner.run_verification((sys.executable, "-c", "import sys; print('bad'); sys.exit(3)"), cwd=state_dir)
+
+            self.assertEqual(passed.status, "PASS")
+            self.assertEqual(passed.details["exit_code"], 0)
+            self.assertEqual(passed.details["argv"], [sys.executable, "-c", "print('ok')"])
+            self.assertIn("ok", passed.details["stdout"])
+            self.assertEqual(failed.status, "FAIL")
+            self.assertEqual(failed.details["exit_code"], 3)
+            self.assertIn("bad", failed.details["stdout"])
+
+            recovered = ForgeRunner.load(state_dir, "run-7")
+            self.assertEqual(recovered.evidence[-2].status, "PASS")
+            self.assertEqual(recovered.evidence[-1].status, "FAIL")
 
 
 if __name__ == "__main__":
