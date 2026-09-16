@@ -3,7 +3,13 @@ import { describe, expect, test, vi } from "vitest";
 import App from "../src/App";
 
 function renderAppWithRequest(request: ReturnType<typeof vi.fn>) {
-  const bridge = { request };
+  const bridge = {
+    request: async (operation: string, payload: Record<string, unknown>) => ({
+      protocol_version: "1.0",
+      ok: true,
+      result: await request(operation, payload),
+    }),
+  };
   render(<App {...({ bridge } as any)} />);
 }
 
