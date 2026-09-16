@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any, Iterable
 
 from kmj_forge.protocol.models import Task
 
@@ -24,6 +24,14 @@ class SkillDescriptor:
         if len(self.capabilities) != len(set(self.capabilities)):
             raise ValueError("skill capabilities must be unique")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {"skill_id": self.skill_id, "description": self.description,
+                "capabilities": list(self.capabilities)}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "SkillDescriptor":
+        return cls(data["skill_id"], data["description"], tuple(data["capabilities"]))
+
 
 class SkillRegistry:
     def __init__(self, skills: Iterable[SkillDescriptor] = ()) -> None:
@@ -33,6 +41,13 @@ class SkillRegistry:
                 raise ValueError(f"duplicate skill id: {skill.skill_id}")
             indexed[skill.skill_id] = skill
         self._skills = indexed
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"skills": [self._skills[key].to_dict() for key in sorted(self._skills)]}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "SkillRegistry":
+        return cls(SkillDescriptor.from_dict(item) for item in data.get("skills", ()))
 
     def resolve_task(self, task: Task) -> tuple[SkillDescriptor, ...]:
         requested = set(task.requested_capabilities)
