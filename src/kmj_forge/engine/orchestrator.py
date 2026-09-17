@@ -13,8 +13,17 @@ class TaskSpec:
     mutation_allowed: bool = False
 
 
+@dataclass(frozen=True)
+class SubagentAssignment:
+    """A side-effect-free assignment of one ready task to one subagent."""
+
+    subagent_id: str
+    task_id: str
+    mutation_allowed: bool = False
+
+
 class Manager:
-    """Deterministically select dependency-ready tasks without executing work."""
+    """Deterministically select and assign dependency-ready tasks without executing work."""
 
     def ready_tasks(
         self,
@@ -47,3 +56,25 @@ class Manager:
             and set(task.dependencies).issubset(completed_task_ids)
         )
         return tuple(sorted(ready, key=lambda task: task.task_id))
+
+    def assign_subagents(
+        self,
+        *,
+        tasks: Iterable[TaskSpec],
+        completed_task_ids: frozenset[str],
+        subagent_ids: Iterable[str],
+    ) -> tuple[SubagentAssignment, ...]:
+        """Assign ready tasks deterministically without starting or mutating any work."""
+
+        agent_ids = tuple(subagent_ids)
+        if any(not agent_id.strip() for agent_id in agent_ids):
+            raise ValueError("subagent_id must be non-empty")
+        if len(set(agent_ids)) != len(agent_ids):
+            raise ValueError("subagent_id values must be unique")
+
+        ready = self.ready_tasks(tasks=tasks, completed_task_ids=completed_task_ids)
+        ordered_agents = tuple(sorted(agent_ids))
+        return tuple(
+            SubagentAssignment(subagent_id=agent_id, task_id=task.task_id)
+            for agent_id, task in zip(ordered_agents, ready)
+        )
