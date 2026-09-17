@@ -50,6 +50,26 @@ class IntegrationPlan:
     mutation_allowed: bool = False
 
 
+@dataclass(frozen=True)
+class CrossReviewAssignment:
+    """A task authored by one subagent and reviewed by a distinct peer."""
+
+    task_id: str
+    author_subagent_id: str
+    reviewer_subagent_id: str
+    worktree_path: str
+    mutation_allowed: bool = False
+
+
+@dataclass(frozen=True)
+class CrossReviewPlan:
+    """A deterministic peer-review plan; review execution remains outside this boundary."""
+
+    assignments: tuple[CrossReviewAssignment, ...]
+    required_checks: tuple[str, ...] = ("requirements_review", "architecture_review", "diff_review", "regression_analysis")
+    mutation_allowed: bool = False
+
+
 def _safe_component(value: str, *, field: str) -> str:
     if not value.strip():
         raise ValueError(f"{field} must be non-empty")
@@ -138,3 +158,28 @@ class Manager:
             raise ValueError("dependency_order must match integration tasks exactly")
         by_task = {item.task_id: item for item in worktree_list}
         return IntegrationPlan(worktrees=tuple(by_task[task_id] for task_id in order))
+
+    def plan_cross_review(self, *, worktrees: Iterable[WorktreeAssignment]) -> CrossReviewPlan:
+        """Assign each worktree to a distinct peer reviewer without executing review actions."""
+        worktree_list = tuple(sorted(worktrees, key=lambda item: (item.task_id, item.subagent_id, item.path)))
+        if len(worktree_list) < 2:
+            raise ValueError("cross-review requires at least two distinct subagents")
+        task_ids = tuple(item.task_id for item in worktree_list)
+        agent_ids = tuple(item.subagent_id for item in worktree_list)
+        paths = tuple(item.path for item in worktree_list)
+        if len(set(task_ids)) != len(task_ids):
+            raise ValueError("cross-review task assignments must be unique")
+        if len(set(agent_ids)) != len(agent_ids):
+            raise ValueError("cross-review subagent assignments must be unique")
+        if len(set(paths)) != len(paths) or any(not path.strip() for path in paths):
+            raise ValueError("cross-review worktree paths must be unique and non-empty")
+        assignments = tuple(
+            CrossReviewAssignment(
+                task_id=item.task_id,
+                author_subagent_id=item.subagent_id,
+                reviewer_subagent_id=worktree_list[(index + 1) % len(worktree_list)].subagent_id,
+                worktree_path=item.path,
+            )
+            for index, item in enumerate(worktree_list)
+        )
+        return CrossReviewPlan(assignments=assignments)
