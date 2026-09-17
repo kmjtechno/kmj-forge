@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import PurePosixPath
 from typing import Iterable
 
 
@@ -22,8 +23,26 @@ class SubagentAssignment:
     mutation_allowed: bool = False
 
 
+@dataclass(frozen=True)
+class WorktreeAssignment:
+    """A deterministic worktree plan; creating the worktree remains outside this boundary."""
+
+    subagent_id: str
+    task_id: str
+    path: str
+    mutation_allowed: bool = False
+
+
+def _safe_component(value: str, *, field: str) -> str:
+    if not value.strip():
+        raise ValueError(f"{field} must be non-empty")
+    if value in {".", ".."} or "/" in value or "\\" in value:
+        raise ValueError(f"{field} must be a safe path component")
+    return value
+
+
 class Manager:
-    """Deterministically select and assign dependency-ready tasks without executing work."""
+    """Deterministically plan isolated orchestration without executing work."""
 
     def ready_tasks(
         self,
@@ -77,4 +96,37 @@ class Manager:
         return tuple(
             SubagentAssignment(subagent_id=agent_id, task_id=task.task_id)
             for agent_id, task in zip(ordered_agents, ready)
+        )
+
+    def assign_worktrees(
+        self,
+        *,
+        assignments: Iterable[SubagentAssignment],
+        root: str,
+    ) -> tuple[WorktreeAssignment, ...]:
+        """Plan one unique isolated worktree per assignment without touching the filesystem."""
+
+        if not root.strip():
+            raise ValueError("root must be non-empty")
+        assignment_list = tuple(assignments)
+        task_ids = tuple(assignment.task_id for assignment in assignment_list)
+        agent_ids = tuple(assignment.subagent_id for assignment in assignment_list)
+        if len(set(task_ids)) != len(task_ids):
+            raise ValueError("task assignments must be unique")
+        if len(set(agent_ids)) != len(agent_ids):
+            raise ValueError("subagent assignments must be unique")
+
+        for assignment in assignment_list:
+            _safe_component(assignment.task_id, field="task_id")
+            _safe_component(assignment.subagent_id, field="subagent_id")
+
+        ordered = sorted(assignment_list, key=lambda item: (item.task_id, item.subagent_id))
+        root_path = PurePosixPath(root)
+        return tuple(
+            WorktreeAssignment(
+                subagent_id=assignment.subagent_id,
+                task_id=assignment.task_id,
+                path=str(root_path / f"{assignment.task_id}--{assignment.subagent_id}"),
+            )
+            for assignment in ordered
         )
