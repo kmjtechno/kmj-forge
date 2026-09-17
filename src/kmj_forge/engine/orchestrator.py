@@ -33,6 +33,14 @@ class WorktreeAssignment:
     mutation_allowed: bool = False
 
 
+@dataclass(frozen=True)
+class ParallelExecutionPlan:
+    """A validated parallel batch plan; starting workers remains outside this boundary."""
+
+    worktrees: tuple[WorktreeAssignment, ...]
+    mutation_allowed: bool = False
+
+
 def _safe_component(value: str, *, field: str) -> str:
     if not value.strip():
         raise ValueError(f"{field} must be non-empty")
@@ -130,3 +138,26 @@ class Manager:
             )
             for assignment in ordered
         )
+
+    def plan_parallel_execution(
+        self,
+        *,
+        worktrees: Iterable[WorktreeAssignment],
+    ) -> ParallelExecutionPlan:
+        """Validate a collision-free parallel batch without starting workers or mutating worktrees."""
+
+        worktree_list = tuple(worktrees)
+        task_ids = tuple(item.task_id for item in worktree_list)
+        agent_ids = tuple(item.subagent_id for item in worktree_list)
+        paths = tuple(item.path for item in worktree_list)
+        if len(set(task_ids)) != len(task_ids):
+            raise ValueError("parallel task assignments must be unique")
+        if len(set(agent_ids)) != len(agent_ids):
+            raise ValueError("parallel subagent assignments must be unique")
+        if len(set(paths)) != len(paths):
+            raise ValueError("parallel worktree paths must be unique")
+        if any(not path.strip() for path in paths):
+            raise ValueError("parallel worktree paths must be non-empty")
+
+        ordered = tuple(sorted(worktree_list, key=lambda item: (item.task_id, item.subagent_id, item.path)))
+        return ParallelExecutionPlan(worktrees=ordered)
