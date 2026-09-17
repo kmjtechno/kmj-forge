@@ -10,9 +10,10 @@ from pathlib import Path
 
 from kmj_forge.protocol import EvidenceRecord, Task
 
-from .evidence import VerificationRequiredError, latest_verification, require_completion_evidence
+from .evidence import VerificationRequiredError, latest_verification, require_completion_evidence, require_plan_completion_evidence
 from .planning import Plan, build_plan
 from .state import RunSnapshot, RunState, transition_state, validate_run_id
+from .verification import VerificationPlan
 
 
 class ApprovalRequiredError(PermissionError):
@@ -121,6 +122,7 @@ class ForgeRunner:
         evidence: list[EvidenceRecord] | None = None,
         approvals: set[str] | None = None,
         plan: Plan | None = None,
+        verification_plan: VerificationPlan | None = None,
     ) -> None:
         self.task = task
         self.snapshot = snapshot
@@ -128,6 +130,7 @@ class ForgeRunner:
         self.evidence = list(evidence or [])
         self.approvals = set(approvals or set())
         self.plan = plan or build_plan(task)
+        self.verification_plan = verification_plan
 
     @property
     def state_path(self) -> Path:
@@ -166,6 +169,7 @@ class ForgeRunner:
             evidence=[EvidenceRecord.from_dict(item) for item in data.get("evidence", [])],
             approvals=set(data.get("approvals", [])),
             plan=Plan.from_dict(data["plan"]) if "plan" in data else None,
+            verification_plan=VerificationPlan.from_dict(data["verification_plan"]) if data.get("verification_plan") else None,
         )
         if runner.snapshot.run_id != safe_run_id:
             raise ValueError("persisted snapshot run_id does not match requested run_id")
@@ -184,6 +188,7 @@ class ForgeRunner:
             "evidence": [record.to_dict() for record in self.evidence],
             "approvals": sorted(self.approvals),
             "plan": self.plan.to_dict(),
+            "verification_plan": self.verification_plan.to_dict() if self.verification_plan else None,
         }
         temporary = self.state_path.with_suffix(".json.tmp")
         temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -212,6 +217,12 @@ class ForgeRunner:
         self.snapshot = next_snapshot
         if stale_record is not None:
             self.evidence.append(stale_record)
+        self._persist()
+
+    def set_verification_plan(self, plan: VerificationPlan) -> None:
+        if plan.task_id != self.task.task_id:
+            raise ValueError("verification plan task_id does not match runner task")
+        self.verification_plan = plan
         self._persist()
 
     def complete_plan_step(self, step_id: str) -> None:
@@ -351,6 +362,8 @@ class ForgeRunner:
 
     def complete(self) -> None:
         require_completion_evidence(self.evidence)
+        if self.verification_plan is not None:
+            require_plan_completion_evidence(self.verification_plan, self.evidence)
         incomplete = tuple(step.step_id for step in self.plan.steps if not step.completed)
         if incomplete:
             raise VerificationRequiredError(
