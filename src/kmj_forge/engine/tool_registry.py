@@ -3,7 +3,7 @@
 from types import MappingProxyType
 from typing import Mapping
 
-from .tool_contract import ToolContract
+from .tool_contract import PermissionClass, ToolContract
 
 
 class ToolRegistry:
@@ -27,6 +27,20 @@ class ToolRegistry:
             return self._contracts[normalized]
         except KeyError:
             raise KeyError(f"tool contract is not registered: {normalized}") from None
+
+    def require_permission(
+        self, name: str, expected_permission: PermissionClass
+    ) -> ToolContract:
+        """Resolve a tool only when its declared permission exactly matches the gate."""
+        if not isinstance(expected_permission, PermissionClass):
+            raise TypeError("expected_permission must be a PermissionClass")
+        contract = self.require(name)
+        if contract.permission_class is not expected_permission:
+            raise PermissionError(
+                f"tool permission mismatch: {contract.name} requires "
+                f"{contract.permission_class.value}, expected {expected_permission.value}"
+            )
+        return contract
 
     def snapshot(self) -> Mapping[str, ToolContract]:
         ordered = {name: self._contracts[name] for name in sorted(self._contracts)}
