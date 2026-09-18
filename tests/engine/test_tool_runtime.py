@@ -49,6 +49,12 @@ class ToolRuntimeTests(unittest.TestCase):
         self.assertEqual(plan.error_schema, "error.v1")
         self.assertEqual(plan.evidence_schema, "evidence.v1")
 
+    def test_plan_exposes_io_schemas_from_same_bound_contract(self):
+        plan = self.runtime.prepare("read_file", expected_permission=PermissionClass.READ_ONLY, security_allowed=True, security_requires_approval=False, approval_granted=False)
+        self.assertEqual(plan.input_schema, "tool-input.v1")
+        self.assertEqual(plan.output_schema, "tool-output.v1")
+        self.assertIs(plan.contract, self.read_contract)
+
     def test_prepare_preserves_denial_with_same_contract(self):
         plan = self.runtime.prepare("write_file", expected_permission=PermissionClass.WORKSPACE_WRITE, security_allowed=True, security_requires_approval=False, approval_granted=False)
         self.assertIs(plan.contract, self.write_contract)
