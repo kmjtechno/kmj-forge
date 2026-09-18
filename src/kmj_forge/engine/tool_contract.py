@@ -18,6 +18,8 @@ class ToolContract:
     timeout_seconds: int
     cancellable: bool
     max_retries: int
+    input_schema: str
+    output_schema: str
     audit_event: str
     error_schema: str
     evidence_schema: str
@@ -31,12 +33,16 @@ class ToolContract:
         timeout_seconds: int,
         cancellable: bool,
         max_retries: int,
+        input_schema: str,
+        output_schema: str,
         audit_event: str,
         error_schema: str,
         evidence_schema: str,
     ) -> "ToolContract":
         identifiers = {
             "name": name,
+            "input_schema": input_schema,
+            "output_schema": output_schema,
             "audit_event": audit_event,
             "error_schema": error_schema,
             "evidence_schema": evidence_schema,
@@ -59,6 +65,8 @@ class ToolContract:
             timeout_seconds=timeout_seconds,
             cancellable=cancellable,
             max_retries=max_retries,
+            input_schema=input_schema.strip(),
+            output_schema=output_schema.strip(),
             audit_event=audit_event.strip(),
             error_schema=error_schema.strip(),
             evidence_schema=evidence_schema.strip(),
