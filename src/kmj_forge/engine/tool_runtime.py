@@ -30,6 +30,14 @@ class ToolInvocationPlan:
         return self.contract.max_retries
 
     @property
+    def input_schema(self) -> str:
+        return self.contract.input_schema
+
+    @property
+    def output_schema(self) -> str:
+        return self.contract.output_schema
+
+    @property
     def audit_event(self) -> str:
         return self.contract.audit_event
 
