@@ -10,6 +10,8 @@ _SCHEMA = "kmj-forge.security-audit.v1"
 _DOCUMENT_FIELDS = {"schema", "entries"}
 _ENTRY_FIELDS = {"sequence", "previous_digest", "digest", "record"}
 _RECORD_FIELDS = {"action_id", "target_id", "allowed", "requires_approval", "signals"}
+_MAX_SERIALIZED_BYTES = 1_048_576
+_MAX_ENTRIES = 10_000
 
 
 def import_audit_log(serialized: str) -> SecurityAuditLog:
@@ -18,10 +20,12 @@ def import_audit_log(serialized: str) -> SecurityAuditLog:
     The importer is deliberately strict: unknown fields and schemas are
     rejected, records are reconstructed through the secret-safe validation
     boundary, and every serialized chain value must match the locally
-    recomputed append-only chain.
+    recomputed append-only chain. Resource limits bound untrusted imports.
     """
     if type(serialized) is not str:
         raise TypeError("audit import accepts JSON strings only")
+    if len(serialized.encode("utf-8")) > _MAX_SERIALIZED_BYTES:
+        raise ValueError("audit import exceeds size limit")
     try:
         document = json.loads(serialized)
     except json.JSONDecodeError as exc:
@@ -30,6 +34,8 @@ def import_audit_log(serialized: str) -> SecurityAuditLog:
         raise ValueError("invalid audit document shape")
     if document["schema"] != _SCHEMA or type(document["entries"]) is not list:
         raise ValueError("unsupported audit schema or entries")
+    if len(document["entries"]) > _MAX_ENTRIES:
+        raise ValueError("audit import exceeds entry limit")
 
     log = SecurityAuditLog()
     for raw_entry in document["entries"]:
