@@ -4,10 +4,12 @@ from kmj_forge.engine.tool_contract import PermissionClass, ToolContract
 from kmj_forge.engine.tool_registry import ToolRegistry
 
 
-def contract(name: str) -> ToolContract:
+def contract(
+    name: str, permission_class: PermissionClass = PermissionClass.READ_ONLY
+) -> ToolContract:
     return ToolContract.create(
         name=name,
-        permission_class=PermissionClass.READ_ONLY,
+        permission_class=permission_class,
         timeout_seconds=1,
         cancellable=True,
         max_retries=0,
@@ -50,6 +52,27 @@ class ToolRegistryTests(unittest.TestCase):
         self.assertEqual(tuple(snapshot), ("read_file", "write_file"))
         with self.assertRaises(TypeError):
             snapshot["other"] = contract("other")
+
+    def test_require_permission_accepts_exact_permission(self):
+        registry = ToolRegistry()
+        expected = contract("write_file", PermissionClass.WORKSPACE_WRITE)
+        registry.register(expected)
+        self.assertIs(
+            registry.require_permission("write_file", PermissionClass.WORKSPACE_WRITE),
+            expected,
+        )
+
+    def test_require_permission_rejects_mismatched_permission_fail_closed(self):
+        registry = ToolRegistry()
+        registry.register(contract("write_file", PermissionClass.WORKSPACE_WRITE))
+        with self.assertRaises(PermissionError):
+            registry.require_permission("write_file", PermissionClass.READ_ONLY)
+
+    def test_require_permission_rejects_invalid_expected_permission(self):
+        registry = ToolRegistry()
+        registry.register(contract("read_file"))
+        with self.assertRaises(TypeError):
+            registry.require_permission("read_file", "read_only")
 
 
 if __name__ == "__main__":
