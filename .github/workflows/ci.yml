@@ -47,11 +47,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "22.14.0"
           package-manager-cache: false
-
-      - name: Pin stable npm
-        run: npm install --global npm@10.8.2
 
       - name: Install desktop dependencies
         working-directory: desktop
@@ -121,11 +118,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "22.14.0"
           package-manager-cache: false
-
-      - name: Pin stable npm
-        run: npm install --global npm@10.8.2
 
       - name: Install desktop dependencies
         working-directory: desktop
