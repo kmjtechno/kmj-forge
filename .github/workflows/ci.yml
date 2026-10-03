@@ -47,12 +47,15 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24.15.0"
           package-manager-cache: false
+
+      - name: Pin npm
+        run: npm install --global npm@11.21.0
 
       - name: Install desktop dependencies
         working-directory: desktop
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Run desktop tests
         working-directory: desktop
@@ -118,12 +121,15 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24.15.0"
           package-manager-cache: false
+
+      - name: Pin npm
+        run: npm install --global npm@11.21.0
 
       - name: Install desktop dependencies
         working-directory: desktop
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Rust toolchain evidence
         run: rustc --version; cargo --version
