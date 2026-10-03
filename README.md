@@ -6,6 +6,8 @@
 
 KMJ Forge is designed as a reusable engineering foundation for KMJ projects and for the wider open-source community. It is not tied to one product, model provider, programming language, IDE, or operating system.
 
+**KMJ TECHNO:** [Website](https://kmjtechno.com) · [Official GitHub Organization](https://github.com/KMJ-TECHNO)
+
 ## Principles
 
 - Universal-first
